@@ -56,6 +56,7 @@ opt.set(['-e','--end'], function(end_date) {
 // Parse the command line options
 if (process.argv.length < 3) {
 	console.log("Try using a command line option for demo:\n" + USAGE());
+	process.exit(1);
 } else {
 	opt.parse(process.argv);
 }
