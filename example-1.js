@@ -14,8 +14,9 @@
 var util = require('util'),
 	opt = require('./opt'),
 	config = {},
+	today = new Date(),
 	USAGE = function () {
-        return "\n\n node example-1.js -- demo options.\n\n SYNOPSIS\n\n\t\tnode example-1.js  --firstname=john \\ \n\t\t\t --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\" ";
+        return "\n\n node example-1.js -- demo options.\n\n SYNOPSIS\n\n\t\tnode example-1.js  --first-name=john \\ \n\t\t\t --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\" ";
 	};
 
 opt.set(['-h','--help'], function () {
