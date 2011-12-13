@@ -1,0 +1,31 @@
+{
+	"name" : "opt",
+	"version" : "0.0.1",
+	"description" : "A very simple options module for NodeJS command line utilities.",
+	"main" : "./opt.js",
+	"repository" : {
+		"type" : "git", 
+		"url" : "https://github.com/rsdoiel/opt.git"
+	},
+	"author" : {
+		"name" : "R. S. Doiel", 
+		"email" : "rsdoiel@gmail.com", 
+		"url" : "https://github.com/rsdoiel"
+	},
+	"maintainers" : [{
+		"name" : "R. S. Doiel", 
+		"url" : "https://github.com/rsdoiel"
+	}],
+	"engines" : {
+		"node" : ">= 0.6",
+		"npm" : ">= 1"
+	},
+	"dependencies" : {
+	},
+	"scripts" : {
+		"test" : "node opt_test.js"
+	},
+	"bugs": {
+		"url": "http://github.com/rsdoiel/opt/issues"
+   	}
+}
