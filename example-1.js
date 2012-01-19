@@ -7,15 +7,15 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.2b
+// revision: 0.0.2c
 //
 var util = require('util'),
 	opt = require('./opt');
 
 opt.setup("USAGE node example-1.js.",
-	"SYNOPSIS\n\n\t\tDemon straight how opt works: node example-1.js --help",
+	"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node example-1.js --help",
 	"OPTIONS",
-	" copyright (c) 2012 all rights reserved\n\n " +
+	" copyright (c) 2012 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
 	" See: http://opensource.org/licenses/bsd-license.php\n");
 opt.set(['-h','--help'], opt.usage, "This help document.");

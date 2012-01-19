@@ -6,7 +6,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.2
+// revision: 0.0.2c
 //
 var	self = {
 		opts : {},
@@ -77,13 +77,16 @@ var help = function () {
 	return self.help;
 };
 
-var setup = function (heading, synopsis, options) {
+var setup = function (heading, synopsis, options, copyright) {
 	self.heading = heading;
 	if (synopsis !== undefined) {
 		self.synopsis = synopsis;
 	}
 	if (options !== undefined) {
 		self.options = options;
+	}
+	if (copyright !== undefined) {
+		self.copyright = copyright;
 	}
 };
 
@@ -97,7 +100,7 @@ var usage = function (msg, error_level) {
     if (error_level !== undefined) {
         console.error(headings.join("\n\n "));
 		if (self.copyright) {
-			console.error("\n " + self.copyright + "\n");
+			console.error(self.copyright);
 		}
         if (msg !== undefined) {
             console.error(" " + msg + "\n");
@@ -124,7 +127,7 @@ var usage = function (msg, error_level) {
 	}
 
 	if (self.copyright) {
-		console.log("\n " + self.copyright + "\n");
+		console.log(self.copyright);
 	}
     process.exit(0);
 };
