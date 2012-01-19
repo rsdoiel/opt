@@ -6,12 +6,14 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.1
+// revision: 0.0.2
 //
-
 var	self = {
 		opts : {},
-		help : {}
+		help : {},
+		heading : false,
+		synopsis : false,
+		options: false
 	};
 
 // setOption = setup an option to be parsed on the command line.
@@ -19,7 +21,7 @@ var	self = {
 // --help), a callback and help string. Callback's are passed a single 
 // parameter containing the option's passed value or true if option 
 // takes no parameters.
-set = function(options, callback, help) {
+var set = function(options, callback, help) {
 	var i = 0;
 	if (typeof options !== "string" && options.join === undefined) {
 		throw ("Options should be a string or have a join method like array.");
@@ -42,7 +44,7 @@ set = function(options, callback, help) {
 };
 
 // Parse the options provided. It does not alter process.argv
-parse = function (argv) {
+var parse = function (argv) {
 	var i = 0;
 	
 	if (argv === undefined) {
@@ -70,10 +72,57 @@ parse = function (argv) {
 	return true;
 };
 
-help = function () {
+var help = function () {
 	return self.help;
+};
+
+var setup = function (heading, synopsis, options) {
+	self.heading = heading;
+	if (synopsis !== undefined) {
+		self.synopsis = synopsis;
+	}
+	if (options !== undefined) {
+		self.options = options;
+	}
+};
+
+var usage = function (msg, error_level) {
+    var ky, headings = [];
+    
+    if (self.heading) {
+    	headings.push(self.heading);
+    }
+
+    if (error_level !== undefined) {
+        console.error(headings.join("\n\n "));
+        if (msg !== undefined) {
+            console.error(" " + msg + "\n");
+        } else {
+            console.error("ERROR: process exited with an error " + error_level);
+        }
+        process.exit(error_level);
+    }
+
+    if (self.synopsis) {
+    	headings.push(self.synopsis);
+    }
+    if (self.options) {
+    	headings.push(self.options);
+    }
+
+    console.log(headings.join("\n\n "));
+    for (ky in self.help) {
+        console.log("\t" + ky + "\t\t" + self.help[ky]);     
+    }
+    console.log("\n\n");
+    if (msg !== undefined) {
+            console.log(" " + msg + "\n");
+        }
+    process.exit(0);
 };
 
 exports.set = set;
 exports.parse = parse;
 exports.help = help;
+exports.setup = setup;
+exports.usage = usage;
