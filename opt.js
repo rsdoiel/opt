@@ -13,7 +13,8 @@ var	self = {
 		help : {},
 		heading : false,
 		synopsis : false,
-		options: false
+		options: false,
+		copyright: false
 	};
 
 // setOption = setup an option to be parsed on the command line.
@@ -90,11 +91,14 @@ var usage = function (msg, error_level) {
     var ky, headings = [];
     
     if (self.heading) {
-    	headings.push(self.heading);
+    	headings.push("\n " + self.heading);
     }
 
     if (error_level !== undefined) {
         console.error(headings.join("\n\n "));
+		if (self.copyright) {
+			console.error("\n " + self.copyright + "\n");
+		}
         if (msg !== undefined) {
             console.error(" " + msg + "\n");
         } else {
@@ -116,8 +120,12 @@ var usage = function (msg, error_level) {
     }
     console.log("\n\n");
     if (msg !== undefined) {
-            console.log(" " + msg + "\n");
-        }
+		console.log(" " + msg + "\n");
+	}
+
+	if (self.copyright) {
+		console.log("\n " + self.copyright + "\n");
+	}
     process.exit(0);
 };
 
