@@ -6,7 +6,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.2c
+// revision: 0.0.2d
 //
 var	self = {
 		opts : {},
