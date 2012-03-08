@@ -1,6 +1,6 @@
 {
 	"name" : "opt",
-	"version" : "0.0.2d",
+	"version" : "0.0.2e",
 	"description" : "A very simple options module for NodeJS command line utilities.",
 	"main" : "./opt.js",
 	"repository" : {
