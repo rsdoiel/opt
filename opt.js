@@ -9,8 +9,9 @@
 // revision: 0.0.2e
 //
 var	self = {
-		opts : {},
-		help : {},
+		opts: {},
+		help: {},
+		consume: [],
 		heading : false,
 		synopsis : false,
 		options: false,
@@ -44,9 +45,16 @@ var set = function(options, callback, help) {
 	return true;
 };
 
+// consume - removing an argument from the processed argument returned
+// by self.parse().
+var consume = function (arg) {
+	self.consume.push(arg);
+};
+
+
 // Parse the options provided. It does not alter process.argv
 var parse = function (argv) {
-	var i = 0;
+	var i = 0, output_argv = [];
 	
 	if (argv === undefined) {
 		argv = process.argv;
@@ -57,18 +65,28 @@ var parse = function (argv) {
 		parts = argv[i].split('\=');
 		if (typeof self.opts[parts[0]] === 'function') {
 			// Check to see if we need split at = or pass next arg.
-                        if (parts.length === 2) {
-                        	if (parts[1][0] == '"' || parts[1][0] == "'") {
-        	                        self.opts[parts[0]](parts[1].substring(1,parts[1].length - 1));
-                        	} else {
-	                                self.opts[parts[0]](parts[1]);
-                        	}
-                        } else if ((i + 1) < argv.length && self.opts[argv[i + 1]] === undefined) {
+			if (parts.length === 2) {
+				if (parts[1][0] == '"' || parts[1][0] == "'") {
+						self.opts[parts[0]](parts[1].substring(1,parts[1].length - 1));
+				} else {
+						self.opts[parts[0]](parts[1]);
+				}
+			} else if ((i + 1) < argv.length && self.opts[argv[i + 1]] === undefined) {
 				self.opts[parts[0]](argv[i + 1]);
 			} else {
 				self.opts[parts[0]]();
 			}
 		}
+	}
+	
+	if (self.consume.length > 0) {
+		argv.forEach(function (arg) {
+			if (self.consume[arg] === undefined &&
+				arg.indexOf('-') < 0) {
+				output_argv.push(arg);
+			}
+		});
+		return output_argv;
 	}
 	return true;
 };
@@ -133,6 +151,7 @@ var usage = function (msg, error_level) {
 };
 
 exports.set = set;
+exports.consume = consume;
 exports.parse = parse;
 exports.help = help;
 exports.setup = setup;
