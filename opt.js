@@ -82,7 +82,7 @@ var parse = function (argv) {
 	if (self.consume.length > 0) {
 		argv.forEach(function (arg) {
 			if (self.consume[arg] === undefined &&
-				arg.indexOf('-') < 0) {
+				arg.indexOf('-') !== 0) {
 				output_argv.push(arg);
 			}
 		});
@@ -96,6 +96,21 @@ var help = function () {
 };
 
 var setup = function (heading, synopsis, options, copyright) {
+	// Reset to defaults
+	self.opts = {};
+	self.help = {};
+	self.consume = [];
+	self.heading = false;
+	self.synopsis = false;
+	self.options = false;
+	self.copyright = false;
+	self.consume = [];
+	if (heading === undefined) {
+		// heading is a required field
+		console.error("Runtime error: missing heading in opt.setup()");
+		return false;
+	}
+	// Now apply the options
 	self.heading = heading;
 	if (synopsis !== undefined) {
 		self.synopsis = synopsis;
@@ -106,6 +121,7 @@ var setup = function (heading, synopsis, options, copyright) {
 	if (copyright !== undefined) {
 		self.copyright = copyright;
 	}
+	return true;
 };
 
 var usage = function (msg, error_level) {

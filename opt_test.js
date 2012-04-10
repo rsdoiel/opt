@@ -46,11 +46,12 @@ for (i = 0; i < test_args.length; i += 1) {
 	assert.equal(help_has_args, test_args[i].help_has_args, "Should have updated help_has_args to " + test_args[i].help_has_args.toString() + " for args: " + JSON.stringify(test_args[i]));
 }
 
-var test_consumable = ['testme', '--database=mydb', 'my_rpt'], 
+var test_consumable = ["testme", "--database=mydb", "my_rpt"], 
 	test_result,
 	test_database_name = false;
 
 // Test consumable args and returning an argv array from parse.
+assert.ok(opt.setup("This is a test"), "Run setup to clear previous opt use.");
 assert.ok(opt.set(['-d','--database'], function (param) {
 	test_database_name = param;
 	opt.consume(param);
@@ -59,5 +60,19 @@ test_result = opt.parse(test_consumable);
 assert.equal(test_result[0], "testme", "Should find testme as test_result[0].");
 assert.equal(test_result[1], "my_rpt", "Should find my_rpt as test_result[1]." + util.inspect(test_result));
 assert.equal(test_database_name, "mydb", "Should find mydb as test_database_name.");
+
+
+test_consumable = ["node", "load-data.js", "--database=mydb", "--collection=mycol", "some-data.txt"];
+opt.setup();
+opt.set(["-d","--database"], function (param) {
+	opt.consume(param);
+}, "Set DB name.");
+opt.set(["-c","--collection"], function (param) {
+	opt.consume(param);
+}, "Set Collection name.");
+test_result = opt.parse(test_consumable);
+assert.equal(test_result[0], "node", "Should have node as test_result[0]");
+assert.equal(test_result[1], "load-data.js", "Should have load-data.js as test_result[1]" + util.inspect(test_result));
+assert.equal(test_result[2], "some-data.txt", "Should have some-data.txt as test_result[2]");
 
 console.log("Success! " + new Date());
