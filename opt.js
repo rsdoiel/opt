@@ -105,11 +105,6 @@ var setup = function (heading, synopsis, options, copyright) {
 	self.options = false;
 	self.copyright = false;
 	self.consume = [];
-	if (heading === undefined) {
-		// heading is a required field
-		console.error("Runtime error: missing heading in opt.setup()");
-		return false;
-	}
 	// Now apply the options
 	self.heading = heading;
 	if (synopsis !== undefined) {

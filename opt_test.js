@@ -63,7 +63,7 @@ assert.equal(test_database_name, "mydb", "Should find mydb as test_database_name
 
 
 test_consumable = ["node", "load-data.js", "--database=mydb", "--collection=mycol", "some-data.txt"];
-opt.setup();
+opt.setup("This is second test.");
 opt.set(["-d","--database"], function (param) {
 	opt.consume(param);
 }, "Set DB name.");
