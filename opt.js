@@ -11,7 +11,7 @@
 var	self = {
 		opts: {},
 		help: {},
-		consume: [],
+		consumable: [],
 		heading : false,
 		synopsis : false,
 		options: false,
@@ -48,7 +48,7 @@ var set = function(options, callback, help) {
 // consume - removing an argument from the processed argument returned
 // by self.parse().
 var consume = function (arg) {
-	self.consume.push(arg);
+	self.consumable.push(arg);
 };
 
 
@@ -79,10 +79,10 @@ var parse = function (argv) {
 		}
 	}
 	
-	if (self.consume.length > 0) {
+	if (self.consumable.length > 0) {
 		argv.forEach(function (arg) {
-			if (self.consume[arg] === undefined &&
-				arg.indexOf('-') !== 0) {
+			if (arg.indexOf('-') !== 0 &&
+				self.consumable.indexOf(arg) === -1) {
 				output_argv.push(arg);
 			}
 		});
@@ -99,12 +99,12 @@ var setup = function (heading, synopsis, options, copyright) {
 	// Reset to defaults
 	self.opts = {};
 	self.help = {};
-	self.consume = [];
+	self.consumable = [];
 	self.heading = false;
 	self.synopsis = false;
 	self.options = false;
 	self.copyright = false;
-	self.consume = [];
+	self.consumable = [];
 	// Now apply the options
 	self.heading = heading;
 	if (synopsis !== undefined) {
