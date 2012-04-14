@@ -1,13 +1,16 @@
 opt
 ===
-revision 0.0.2
+revision 0.0.3
 --------------
 
 # Overview
 
-A very simple options module for NodeJS command line apps.
+A very simple options module for NodeJS command line apps. Version 0.0.3d
+adds support for using with MongoDB shell.
 
-# Examples
+# Examples 1
+
+Display a help message with -h and --help on the command line.
 
 Source code example-1.js
 
@@ -25,6 +28,8 @@ Source code example-1.js
 	} else {
 		opt.parse(process.argv);
 	}
+
+# Example 2
 
 Source code example-2.js
 
@@ -76,6 +81,8 @@ Source code example-2.js
 	console.log("\nConfig object properties set by opt: ");
 	console.log(util.inspect(config));
 
+# Example, json blob to Shell script file
+
 Source code json2sh.js
 
 	var fs = require('fs'),
@@ -114,3 +121,49 @@ Source code json2sh.js
 	});
 	buf.push("\n");
 	fs.writeFileSync(output, buf.join("\n"));
+
+# Example 3, handing options and resolving argv
+
+Source code: example-3.js
+
+	var util = require("util"),
+			path = require("path"),
+			opt = require("./opt"),
+			input_name = false,
+			output_name = false,
+			database_name = false,
+			collection_name = false,
+			new_args = [];
+	
+	opt.setup("USAGE: node " + path.basename(process.argv[1]) + " [options] input_name output_name",
+			"SYNOPSIS: Show how you can make a simple command line program using consumable args.",
+			"OPTIONS:",
+			" Example Organization Name here\n" +
+			" Some copyright statement here.");
+	
+	opt.consume(true);// Turn on argument consumption
+	opt.set(["-d", "--database"], function (param) {
+			database_name = param;
+			opt.consume(param);
+	}, "Set the database name.");
+	opt.set(["-c", "--collection"], function (param) {
+			collection_name = param;
+			opt.consume(param);
+	}, "Set the collection name.");
+	opt.set(["-i", "--input"], function (param) {
+			input_name = param;
+			opt.consume(param);
+	});
+	opt.set(["-o", "--output"], function (param) {
+	}, "Set the output name.");
+	opt.set(["-h", "--help"], opt.usage, "This help page.");
+	
+	new_args = opt.parse(process.argv);
+	if (new_args[1] !== undefined) {
+			input_name = new_args[1];
+	}
+	if (new_args[2] !== undefined) {
+			output_name = new_args[2];
+	}
+	console.log("New args: " + util.inspect(new_args));
+	console.log("Input name:", input_name);
