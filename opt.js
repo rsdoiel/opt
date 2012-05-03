@@ -10,6 +10,8 @@
 //
 
 (function () {
+	var fs = require("fs");
+
 	var	self = {
 			opts: {},
 			help: {},
@@ -190,16 +192,16 @@
 			}
 		}
 	
-		// Merge in the custom configuration
 		if (src) {
-			Object.keys(config).forEach(function (ky) {
-				if (custom_config[ky] !== undefined) {
-					default_config[ky] = custom_config[ky];
+			// Override the default config with the custom configuration
+			Object.keys(default_config).forEach(function (ky) {
+				if (custom_config[ky] === undefined) {
+					custom_config[ky] = default_config[ky];
 				}
 			});
 		}
 		
-		return default_config;
+		return custom_config;
 	};
 	
 	if (exports === undefined) {
@@ -212,4 +214,5 @@
 	exports.help = help;
 	exports.setup = setup;
 	exports.usage = usage;
+	exports.configSync = configSync;
 }());

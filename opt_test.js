@@ -7,10 +7,11 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.3d
+// revision: 0.0.4
 //
 
-var	util = require("util"),
+var fs = require('fs'),
+	util = require("util"),
 	assert = require("assert"),
 	opt = require("./opt");
 
@@ -89,4 +90,40 @@ assert.equal(test_result[0], "node", "Should have node as test_result[0]");
 assert.equal(test_result[1], "load-data.js", "Should have load-data.js as test_result[1]" + util.inspect(test_result));
 assert.equal(test_result[2], "some-data.txt", "Should have some-data.txt as test_result[2]");
 assert.equal(test_result.length, 3, "Should only have three args." + util.inspect(test_result));
+
+console.log("Testing configSync()");
+var test_config = { name: "opt", version: "0.0.1" }, 
+	test_paths = ["package.json"],
+	result_config = {},
+	package_json = fs.readFileSync("package.json").toString(),
+	package_obj = JSON.parse(package_json);
+
+result_config = opt.configSync(test_config, test_paths);
+assert.equal(result_config.name, test_config.name, "Should have name matching.");
+assert.notEqual(result_config.version, test_config.version, (function (msg) {
+	return [
+		"Result Config:",
+		JSON.stringify(result_config),
+		"Test Config:",
+		JSON.stringify(test_config),
+		msg].join(" ");
+}("Version should not match.")));
+
+Object.keys(package_obj).forEach(function(ky) {
+	assert.ok(result_config[ky], "Should have " + ky + " in result_config.");
+	switch (typeof package_obj[ky]) {
+	case 'string':
+		assert.equal(result_config[ky], package_obj[ky], "Should have matching values for " + ky);
+		break;
+	case 'object':
+		Object.keys(package_obj[ky]).forEach(function (subky) {
+			if (typeof package_obj[ky][subky] === "string") {
+				assert.ok(result_config[ky][subky], "Should have [" + ky + "][" + subky + "] in result_config.");
+				assert.equal(result_config[ky][subky], package_obj[ky][subky], "Should have matching values for [" + ky + "][" + subky + "]");			
+			}
+		});
+		break;
+	}
+});
+
 console.log("Success! " + new Date());
