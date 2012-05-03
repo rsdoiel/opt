@@ -1,6 +1,6 @@
 opt
 ===
-revision 0.0.4
+revision 0.0.5
 --------------
 
 # Overview
@@ -9,21 +9,25 @@ A very simple options module for NodeJS command line apps. Version 0.0.4
 adds support with a new configSync() method to load and merge in a default
 configuration file.
 
-# Configuration processing example
+# Config Example 1
 
-	var default_config { name: "fred", "email": "fred@example.com" },
-	    search_paths = [ path.join(process.env.HOME, ".fredrc"),
+	var path = require('path'),
+		opt = require('./opt');
+	
+	var config = { name: "fred", "email": "fred@example.com" },
+		search_paths = [ "config-example-1.conf",
+				path.join(process.env.HOME, ".fredrc"),
 				"/usr/local/etc/fred.conf",
 				"/usr/etc/fred.conf",
-				"/etc/fred.conf" ],
-	    config;
+				"/etc/fred.conf" ];
 		
-	config = opt.configSync(default_config, search_paths);
-
+	console.log("Unprocessed config:", config);
+	config = opt.configSync(config, search_paths);
+	
 	// config should now hold the merge configuration
 	// from default_config and the first configuration file 
 	// found in the search path list.
-	console.log(config);
+	console.log("Processed config: ", config);
 
 
 # Examples 1

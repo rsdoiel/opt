@@ -6,7 +6,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.4
+// revision: 0.0.5
 //
 
 (function () {
@@ -177,7 +177,12 @@
 	var configSync = function (default_config, search_paths) {
 		var custom_config = {}, fname, src;
 	
-		fname = search_paths.shift();
+		if (search_paths !== undefined && 
+			search_paths.shift !== undefined) {
+			fname = search_paths.shift();
+		} else {
+			fname = false;
+		}
 		while (fname) {
 			try {
 				src = fs.readFileSync(fname).toString();
@@ -199,6 +204,8 @@
 					custom_config[ky] = default_config[ky];
 				}
 			});
+		} else {
+			custom_config = default_config;
 		}
 		
 		return custom_config;

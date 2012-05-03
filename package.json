@@ -1,6 +1,6 @@
 {
 	"name" : "opt",
-	"version" : "0.0.4",
+	"version" : "0.0.5",
 	"description" : "A very simple options and configuration processor module for NodeJS command line utilities.",
 	"main" : "./opt.js",
 	"repository" : {

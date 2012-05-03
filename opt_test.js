@@ -7,7 +7,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.4
+// revision: 0.0.5
 //
 
 var fs = require('fs'),
@@ -124,6 +124,24 @@ Object.keys(package_obj).forEach(function(ky) {
 		});
 		break;
 	}
+});
+
+// Process when missing search paths.
+result_config = opt.configSync(test_config);
+Object.keys(test_config).forEach(function (ky) {
+	assert.equal(result_config[ky], test_config[ky], ky + " should match");
+});
+Object.keys(result_config).forEach(function (ky) {
+	assert.equal(result_config[ky], test_config[ky], ky + " should match");
+});
+
+// Process when missing any config file.
+result_config = opt.configSync(test_config,["missing-file.conf"]);
+Object.keys(test_config).forEach(function (ky) {
+	assert.equal(result_config[ky], test_config[ky], ky + " should match");
+});
+Object.keys(result_config).forEach(function (ky) {
+	assert.equal(result_config[ky], test_config[ky], ky + " should match");
 });
 
 console.log("Success! " + new Date());
