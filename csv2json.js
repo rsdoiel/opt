@@ -30,7 +30,6 @@ opt.setup("USAGE: node " + path.basename(process.argv[1]) + " [options] CSVFILE 
         " See: http://opensource.org/licenses/bsd-license.php"
 );
 
-opt.consume(true);
 opt.set(["-i", "--input", "--csv"], function (param) {
         csv_filename = param;
         opt.consume(param);

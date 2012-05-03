@@ -1,6 +1,7 @@
 //
 // Show the use of consumable args and rendering a resulting
-// argv from parse.
+// argv from opt.parse(process.argv).
+//
 
 /* Example output:
 example.com:  node example-3.js one two

@@ -6,7 +6,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.3d
+// revision: 0.0.4
 //
 
 (function () {
@@ -17,7 +17,8 @@
 			heading : false,
 			synopsis : false,
 			options: false,
-			copyright: false
+			copyright: false,
+			configuration: {}
 		};
 	
 	// setOption = setup an option to be parsed on the command line.
@@ -93,10 +94,12 @@
 		return true;
 	};
 	
+	// Return the aggregated help information.
 	var help = function () {
 		return self.help;
 	};
 	
+	// Compose the basic command line text description
 	var setup = function (heading, synopsis, options, copyright) {
 		// Reset to defaults
 		self.opts = {};
@@ -121,6 +124,7 @@
 		return true;
 	};
 	
+	// Render opt's setup and exit with an error level
 	var usage = function (msg, error_level) {
 		var ky, headings = [];
 		
@@ -161,6 +165,41 @@
 			console.log(self.copyright);
 		}
 		process.exit(0);
+	};
+
+	// Given a default configuration, search the search paths
+	// for JSON file on disc with custom configuration.
+	// return a resulting configuration object.	
+	// default_config: is an Object
+	// search_paths: is an array of search paths
+	var configSync = function (default_config, search_paths) {
+		var custom_config = {}, fname, src;
+	
+		fname = search_paths.shift();
+		while (fname) {
+			try {
+				src = fs.readFileSync(fname).toString();
+			} catch (err) {
+				src = '';
+			}
+			if (src) {
+				fname = false;
+				custom_config = JSON.parse(src);
+			} else {
+				fname = search_paths.shift();
+			}
+		}
+	
+		// Merge in the custom configuration
+		if (src) {
+			Object.keys(config).forEach(function (ky) {
+				if (custom_config[ky] !== undefined) {
+					default_config[ky] = custom_config[ky];
+				}
+			});
+		}
+		
+		return default_config;
 	};
 	
 	if (exports === undefined) {
