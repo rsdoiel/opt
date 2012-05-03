@@ -12,11 +12,14 @@ configuration file.
 # Configuration processing example
 
 	var default_config { name: "fred", "email": "fred@example.com" },
-		search_paths = [ path.join(process.env.HOME, ".fredrc"),
-			"/usr/local/etc/fred.conf",
-			"/usr/etc/fred.conf",
-			"/etc/fred.conf" ],
-		config = opt.configSync(default_config, search_paths;
+	    search_paths = [ path.join(process.env.HOME, ".fredrc"),
+				"/usr/local/etc/fred.conf",
+				"/usr/etc/fred.conf",
+				"/etc/fred.conf" ],
+	    config;
+		
+	config = opt.configSync(default_config, search_paths);
+
 	// config should now hold the merge configuration
 	// from default_config and the first configuration file 
 	// found in the search path list.
