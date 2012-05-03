@@ -5,8 +5,23 @@ revision 0.0.4
 
 # Overview
 
-A very simple options module for NodeJS command line apps. Version 0.0.3d
-adds support for using with MongoDB shell.
+A very simple options module for NodeJS command line apps. Version 0.0.4
+adds support with a new configSync() method to load and merge in a default
+configuration file.
+
+# Configuration processing example
+
+	var default_config { name: "fred", "email": "fred@example.com" },
+		search_paths = [ path.join(process.env.HOME, ".fredrc"),
+			"/usr/local/etc/fred.conf",
+			"/usr/etc/fred.conf",
+			"/etc/fred.conf" ],
+		config = opt.configSync(default_config, search_paths;
+	// config should now hold the merge configuration
+	// from default_config and the first configuration file 
+	// found in the search path list.
+	console.log(config);
+
 
 # Examples 1
 
