@@ -6,7 +6,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.5
+// revision: 0.0.6
 //
 
 (function () {
@@ -210,6 +210,56 @@
 		
 		return custom_config;
 	};
+
+	// Given a default configuration, search the search paths
+	// for JSON file on disc with custom configuration.
+	// return a resulting configuration object.	
+	// default_config: is an Object
+	// search_paths: is an array of search paths
+	var config = function (default_config, search_paths, callback) {
+		var scanPaths, processPath;
+		
+		// Recursive attempt to read the configuration
+		processPath = function (fname, remaining_paths, callback) {
+			fs.readFile(fname, function (err, buf) {
+				var custom_config;
+				if (err || buf.length === 0) {
+					scanPaths(remaining_paths, callback);
+					return;
+				}
+				try {
+					custom_config = JSON.parse(buf.toString());
+				} catch(json_error) {
+					// We've found a config file, but there's an problem.
+					callback({fname: fname, error_msg: json_error}, null);
+					return;
+				}
+				Object.keys(default_config).forEach(function (ky) {
+					if (custom_config[ky] === undefined) {
+						custom_config[ky] = default_config[ky];
+					}
+				});
+				callback(null, custom_config);
+			});
+		};	
+	
+		scanPaths = function (remaining_paths, callback) {
+			var custom_config = {}, fname, src;
+			
+			if (remaining_paths.length > 0) {
+				fname = remaining_paths.shift();
+				processPath(fname, remaining_paths, callback); 
+			} else {
+				// we've search everyone where so
+				// return the default config.
+				callback(null, default_config);
+			}
+		};
+	
+		// Scan the path list until we have a config
+		// or have exhausted our search.
+		scanPaths(search_paths, callback);
+	};
 	
 	if (exports === undefined) {
 		exports = this;
@@ -222,4 +272,5 @@
 	exports.setup = setup;
 	exports.usage = usage;
 	exports.configSync = configSync;
+	exports.config = config;
 }());

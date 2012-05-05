@@ -1,6 +1,6 @@
 opt
 ===
-revision 0.0.5
+revision 0.0.6
 --------------
 
 # Overview
@@ -10,6 +10,8 @@ adds support with a new configSync() method to load and merge in a default
 configuration file.
 
 # Config Example 1
+
+This is the synchronous version
 
 	var path = require('path'),
 		opt = require('./opt');
@@ -29,6 +31,28 @@ configuration file.
 	// found in the search path list.
 	console.log("Processed config: ", config);
 
+
+# Config Example 2
+
+This is the asynchronous version
+
+	var path = require('path'),
+		opt = require('./opt');
+	
+	var config = { name: "fred", "email": "fred@example.com" },
+		search_paths = [ "config-example-1.conf",
+				path.join(process.env.HOME, ".fredrc"),
+				"/usr/local/etc/fred.conf",
+				"/usr/etc/fred.conf",
+				"/etc/fred.conf" ];
+		
+	console.log("Unprocessed config:", config);
+	config = opt.config(config, search_paths, function (err, config) {
+		// config should now hold the merge configuration
+		// from default_config and the first configuration file 
+		// found in the search path list.
+		console.log("Processed config: ", config);
+	});
 
 # Examples 1
 
