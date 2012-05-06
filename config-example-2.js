@@ -1,8 +1,8 @@
 //
 // Demo a simple asynchronous configuration processing
 //
-var path = require('path'),
-	opt = require('./opt');
+var path = require("path"),
+	opt = require("./opt");
 
 var config = { name: "fred", "email": "fred@example.com" },
 	search_paths = [ "config-example-1.conf",

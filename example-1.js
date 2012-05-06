@@ -8,8 +8,8 @@
 // See: http://opensource.org/licenses/bsd-license.php
 //
 
-var util = require('util'),
-	opt = require('./opt');
+var util = require("util"),
+	opt = require("./opt");
 
 opt.setup("USAGE node example-1.js.",
 	"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node example-1.js --help",
@@ -17,7 +17,7 @@ opt.setup("USAGE node example-1.js.",
 	" copyright (c) 2012 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
 	" See: http://opensource.org/licenses/bsd-license.php\n");
-opt.set(['-h','--help'], opt.usage, "This help document.");
+opt.set(["-h", "--help"], opt.usage, "This help document.");
 	
 // Parse the command line options
 if (process.argv.length < 3) {

@@ -10,9 +10,9 @@
 // See: http://opensource.org/licenses/bsd-license.php
 //
 
-var fs = require('fs'),
-	path = require('path'),
-	opt = require('opt');
+var fs = require("fs"),
+	path = require("path"),
+	opt = require("opt");
 	
 var csv_filename = false, 
 	json_filename = false,
@@ -52,13 +52,13 @@ if (args === true &&
 if (csv_filename === false && args.length > 2) {
 	csv_filename = args[2].trim();
 } else if (csv_filename === false) {
-	csv_filename = '-';
+	csv_filename = "-";
 }
 
 if (json_filename === false && args.length > 3) {
 	json_filename = args[3].trim();
 } else if (json_filename === false) {
-	json_filename = '-';
+	json_filename = "-";
 }
 
 
@@ -69,7 +69,7 @@ if (json_filename === false && args.length > 3) {
 	var fromCSV = function (i, line) {
 		var row;
 		try {
-			row = JSON.parse('[' + line + ']');
+			row = JSON.parse("[" + line + "]");
 		} catch (err) {
 			console.error("ERROR: Invalid CSV file at line", i);
 			console.error("\t", line);
@@ -110,14 +110,14 @@ if (json_filename === false && args.length > 3) {
 				}
 			}
 		});
-		if (json_filename === '-') {
+		if (json_filename === "-") {
 			console.log(toBlobs(structure, buf));
 		} else {
 			fs.writeFile(json_filename, toBlobs(structure, buf), "UTF-8");
 		}
 	};
 
-	if (csv_filename === '-') {
+	if (csv_filename === "-") {
 		(function () {
 			var buf = [], interval_id;
 			process.stdin.resume();

@@ -8,9 +8,9 @@
 // See: http://opensource.org/licenses/bsd-license.php
 //
 
-var util = require('util'),
-	path = require('path'),
-	opt = require('./opt'),
+var util = require("util"),
+	path = require("path"),
+	opt = require("./opt"),
 	config = {},
 	today = new Date();
 
@@ -20,31 +20,31 @@ opt.setup("USAGE:  node " + path.basename(process.argv[1]) + " --help",
 	" copyright (c) 2011 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
 	" See: http://opensource.org/licenses/bsd-license.php\n");
-opt.set(['-h','--help'], opt.usage, "This help document.");
+opt.set(["-h", "--help"], opt.usage, "This help document.");
 
-opt.set(['-f', '--first-name'], function (first_name) {
+opt.set(["-f", "--first-name"], function (first_name) {
         config.first_name = first_name;
 }, "Set the first name column contents. E.g. John");
 
-opt.set(['-l', '--last-name'], function (last_name) {
+opt.set(["-l", "--last-name"], function (last_name) {
     config.last_name = last_name;
 }, "Set the last name column contents. E.g. Doe");
 
 
-opt.set(['-s','--start'], function(start_date) {
+opt.set(["-s", "--start"], function(start_date) {
         config.start = start_date;
 }, "Set the start date for reporting in YYYY-MM-DD format.");
 
-opt.set(['-e','--end'], function(end_date) {
+opt.set(["-e", "--end"], function(end_date) {
         if (end_date.length == 10 &&
                 end_date.match(/20[0-2][0-9]-[0-3][0-9]-[0-3][0-9]/)) {
                 config.end = end_date;
         } else {
-                config.end = today.getFullYear() + '-' + 
-                        String("0" + (today.getMonth() + 1)).substr(-2) + '-' +
+                config.end = today.getFullYear() + "-" + 
+                        String("0" + (today.getMonth() + 1)).substr(-2) + "-" +
                         String("0" + (today.getDate())).substr(-2);
         }
-}, "Set the last date for reporting.  Usually a date in YYYY-MM-DD format or 'now'.");
+}, "Set the last date for reporting.  Usually a date in YYYY-MM-DD format or \"now\".");
 
 // Parse the command line options
 if (process.argv.length < 3) {

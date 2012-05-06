@@ -13,13 +13,13 @@
 	var fs = require("fs");
 
 	var	self = {
-			opts: {},
-			help: {},
-			consumable: [],
-			heading : false,
-			synopsis : false,
-			options: false,
-			copyright: false,
+			opts: {}, 
+			help: {}, 
+			consumable: [], 
+			heading : false, 
+			synopsis : false, 
+			options: false, 
+			copyright: false, 
 			configuration: {}
 		};
 	
@@ -33,16 +33,16 @@
 		if (typeof options !== "string" && options.join === undefined) {
 			throw ("Options should be a string or have a join method like array.");
 		}
-		if (typeof callback !== 'function') {
+		if (typeof callback !== "function") {
 			throw ("Callback must be a function");
 		}
 		if (help === undefined) { help = "Option is not documented"; }
 	
-		if (typeof options !== 'string') {
+		if (typeof options !== "string") {
 			for (i = 0; i < options.length; i += 1) {
 				self.opts[options[i]] = callback;
 			}
-			self.help[options.join(',')] = help;
+			self.help[options.join(", ")] = help;
 		} else {
 			self.opts[options] = callback;
 			self.help[options] = help;
@@ -67,12 +67,12 @@
 	
 		// loop through command line and process args with callbacks.
 		for (i = 0; i < argv.length; i += 1) {
-			parts = argv[i].split('\=');
-			if (typeof self.opts[parts[0]] === 'function') {
+			parts = argv[i].split("\=");
+			if (typeof self.opts[parts[0]] === "function") {
 				// Check to see if we need split at = or pass next arg.
 				if (parts.length === 2) {
 					if (parts[1][0] == '"' || parts[1][0] == "'") {
-							self.opts[parts[0]](parts[1].substring(1,parts[1].length - 1));
+							self.opts[parts[0]](parts[1].substring(1, parts[1].length - 1));
 					} else {
 							self.opts[parts[0]](parts[1]);
 					}
@@ -86,7 +86,7 @@
 		
 		if (self.consumable.length > 0) {
 			argv.forEach(function (arg) {
-				if (arg.indexOf('-') !== 0 &&
+				if (arg.indexOf("-") !== 0 &&
 					self.consumable.indexOf(arg) === -1) {
 					output_argv.push(arg);
 				}
@@ -187,7 +187,7 @@
 			try {
 				src = fs.readFileSync(fname).toString();
 			} catch (err) {
-				src = '';
+				src = "";
 			}
 			if (src) {
 				fname = false;

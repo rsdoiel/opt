@@ -10,19 +10,19 @@
 // revision: 0.0.6
 //
 
-var fs = require('fs'),
+var fs = require("fs"),
 	util = require("util"),
 	assert = require("assert"),
 	opt = require("./opt");
 
 var help_has_args = false, 
-	test_args = [ { args : ['testme', '-h', 'something else'], help_has_args : true, r : 'something else' },
-		{ args : ['testme', '--help', 'something else'], help_has_args : true, r : 'something else' },
-		{ args : ['testme', '--help="something else"'], help_has_args : true, r : 'something else' },
-		{ args : ['testme', "--help='something else'"], help_has_args : true, r : 'something else' },
-		{ args : ['testme', '--help=something_else'], help_has_args : true, r : 'something_else' },
-		{ args : ['testme', '-h'], help_has_args : false, r : false },
-		{ args : ['testme', '--help'], help_has_args : false, r : false }
+	test_args = [ { args : ["testme", "-h", "something else"], help_has_args : true, r : "something else" },
+		{ args : ["testme", "--help", "something else"], help_has_args : true, r : "something else" },
+		{ args : ["testme", "--help=\"something else\""], help_has_args : true, r : "something else" },
+		{ args : ["testme", "--help='something else'"], help_has_args : true, r : "something else" },
+		{ args : ["testme", "--help=something_else"], help_has_args : true, r : "something_else" },
+		{ args : ["testme", "-h"], help_has_args : false, r : false },
+		{ args : ["testme", "--help"], help_has_args : false, r : false }
 	],
 	test_no = 0,
 	package_json = fs.readFileSync("package.json").toString(),
@@ -89,8 +89,8 @@ var monitorTests = function () {
 console.log("Starting (opt_test.js) ... " + new Date());
 
 doTest("opt creation", function (test_name) {
-	assert.equal(typeof opt.set,'function', "Should see an exported set()");
-	assert.equal(typeof opt.parse, 'function', "Should see an exported parse()");
+	assert.equal(typeof opt.set, "function", "Should see an exported set()");
+	assert.equal(typeof opt.parse, "function", "Should see an exported parse()");
 	completedTest(test_name);
 });
 
@@ -102,7 +102,7 @@ doTest("param processing and help()", function (test_name) {
 		}
 	};
 	
-	assert.ok(opt.set(['-h','--help'], help, "Show the help document."), "set() should return true.");
+	assert.ok(opt.set(["-h", "--help"], help, "Show the help document."), "set() should return true.");
 	for (i = 0; i < test_args.length; i += 1) {
 		test_no = i;
 		help_has_args = false;
@@ -120,7 +120,7 @@ doTest("Consumables", function (test_name) {
 	
 	// Test consumable args and returning an argv array from parse.
 	assert.ok(opt.setup("This is a test"), "Run setup to clear previous opt use.");
-	assert.ok(opt.set(['-d','--database'], function (param) {
+	assert.ok(opt.set(["-d", "--database"], function (param) {
 		test_database_name = param;
 		opt.consume(param);
 	}, "Should set the database name."), "Should set the database name and consume the arg");
@@ -132,10 +132,10 @@ doTest("Consumables", function (test_name) {
 	
 	test_consumable = ["node", "load-data.js", "--database=mydb", "--collection=mycol", "some-data.txt"];
 	opt.setup("This is second test.");
-	opt.set(["-d","--database"], function (param) {
+	opt.set(["-d", "--database"], function (param) {
 		opt.consume(param);
 	}, "Set DB name.");
-	opt.set(["-c","--collection"], function (param) {
+	opt.set(["-c", "--collection"], function (param) {
 		opt.consume(param);
 	}, "Set Collection name.");
 	test_result = opt.parse(test_consumable);
@@ -144,12 +144,12 @@ doTest("Consumables", function (test_name) {
 	assert.equal(test_result[2], "some-data.txt", "Should have some-data.txt as test_result[2]");
 	
 	// node myproj.js some-data.txt -d mydb -c mycol
-	test_consumable = ["node", "load-data.js", "some-data.txt", "-d", "mydb", "-c","mycol"];
+	test_consumable = ["node", "load-data.js", "some-data.txt", "-d", "mydb", "-c", "mycol"];
 	opt.setup("This is the third test.");
-	opt.set(["-d","--database"], function (param) {
+	opt.set(["-d", "--database"], function (param) {
 		opt.consume(param);
 	}, "Set DB name.");
-	opt.set(["-c","--collection"], function (param) {
+	opt.set(["-c", "--collection"], function (param) {
 		opt.consume(param);
 	}, "Set Collection name.");
 	test_result = opt.parse(test_consumable);
@@ -181,10 +181,10 @@ doTest("Testing configSync()", function (test_name) {
 	Object.keys(package_obj).forEach(function(ky) {
 		assert.ok(result_config[ky], "Should have " + ky + " in result_config.");
 		switch (typeof package_obj[ky]) {
-		case 'string':
+		case "string":
 			assert.equal(result_config[ky], package_obj[ky], "Should have matching values for " + ky);
 			break;
-		case 'object':
+		case "object":
 			Object.keys(package_obj[ky]).forEach(function (subky) {
 				if (typeof package_obj[ky][subky] === "string") {
 					assert.ok(result_config[ky][subky], "Should have [" + ky + "][" + subky + "] in result_config.");
@@ -205,7 +205,7 @@ doTest("Testing configSync()", function (test_name) {
 	});
 	
 	// Process when missing any config file.
-	result_config = opt.configSync(test_config,["missing-file.conf"]);
+	result_config = opt.configSync(test_config, ["missing-file.conf"]);
 	Object.keys(test_config).forEach(function (ky) {
 		assert.equal(result_config[ky], test_config[ky], ky + " should match");
 	});
@@ -236,10 +236,10 @@ doTest("Testing config()", function (test_name) {
 		Object.keys(package_obj).forEach(function(ky) {
 			assert.ok(result_config[ky], "Should have " + ky + " in result_config.");
 			switch (typeof package_obj[ky]) {
-			case 'string':
+			case "string":
 				assert.equal(result_config[ky], package_obj[ky], "Should have matching values for " + ky);
 				break;
-			case 'object':
+			case "object":
 				Object.keys(package_obj[ky]).forEach(function (subky) {
 					if (typeof package_obj[ky][subky] === "string") {
 						assert.ok(result_config[ky][subky], "Should have [" + ky + "][" + subky + "] in result_config.");
