@@ -4,20 +4,20 @@
 //
 
 /*
-Demonstration problem:
+Fred's Problem:
 	
-	Fred would like a command line tool to say hello and optionally remind him
+	Fred wants a command line tool to say hello and optionally remind him
 	of his email address. Fred likes configuration files but sometimes he
 	stores them in different places (e.g. $HOME/fred.cnf,
-	/usr/etc/fred.cnf, and /etc/fred.cnf) depending on his machine.
-	Fred make lots of typos so he would like to setup the configuration
-	with this program and generate a valid JSON file based in it.
+	/usr/etc/fred.cnf, and /etc/fred.cnf).  Fred make lots of typos so he 
+	would like to setup the configuration with this program and generate a
+	valid JSON file based in it.
 	
 */
 
-var fs = require('fs'),
-	path = require('path'),
-	opt = require('./opt'),
+var fs = require("fs"),
+	path = require("path"),
+	opt = require("./opt"),
 	default_config = { name: "fred", "email": "fred@example.com",
 		show_email: false },
 	config = {},
@@ -41,7 +41,7 @@ opt.setup("USAGE node " + path.basename(process.argv[1]),
 		" See: http://opensource.org/licenses/bsd-license.php\n");
 
 // Use a specific configuration file
-opt.set(['-c', '--config'], function (config_filename) {
+opt.set(["-c", "--config"], function (config_filename) {
 	if (config_filename) {
 		config = opt.configSync(default_config, [config_filename]);
 		opt.consume(config_filename);
@@ -49,30 +49,30 @@ opt.set(['-c', '--config'], function (config_filename) {
 }, "Use a specific configuration file");
 
 // Optionally show Fred's email address
-opt.set(['-e', '--email'], function () {
+opt.set(["-e", "--email"], function () {
 	config.show_email = true;
-}, "Show the email address too.");
+}, "Show the email address.");
 
-opt.set(['-E', '--no-email'], function () {
+opt.set(["-E", "--no-email"], function () {
 	config.show_email = false;
-}, "Show the email address too.");
+}, "Don't show the email address.");
 
 // Generate and write a configuration file.
-opt.set(['-g', '--generate'], function (param) {
+opt.set(["-g", "--generate"], function (param) {
 	config_only = true;
 	if (param !== undefined && param.trim() !== "") {
 		config_filename = param.trim();
 	}
 	opt.consume(param);
-}, "Write a configuration file based on previous options.");
+}, "Generate a configuration JSON expression. Optionally save it to a file.");
 
-opt.set(['-h','--help'], opt.usage, "This help document.");
+opt.set(["-h", "--help"], opt.usage, "This help document.");
 
 // Process the command line arguments
 opt.parse(process.argv);
 
 //
-// Now that everything is configuration run program.
+// Now that everything is configured do what Fred wants.
 //
 if (config_only === true) {
 	if (config_filename === "") {
