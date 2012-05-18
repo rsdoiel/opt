@@ -9,8 +9,7 @@
 // revision: 0.0.6
 //
 
-/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
-/*global fs */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true, stupid: true */
 
 (function () {
 	var fs = require("fs");
