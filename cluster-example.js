@@ -75,7 +75,7 @@ var parentProcess = function (config) {
 	
 	console.log("PARENT CONFIG:",config);
 	for (i = 0; i < config.numChildren; i += 1) {
-		worker = cluster.fork();
+		worker = cluster.fork().process;
 		child_process[worker.pid] = worker;
 		child_process[worker.pid].on("death", function (worker) {
 			var new_worker, old_pid = worker.pid;
@@ -84,7 +84,7 @@ var parentProcess = function (config) {
 			delete child_processes[old_pid];
 
 			console.log("Restarted worker", old_pid, "as", new_worker.pid);			
-			new_worker = cluster.fork();
+			new_worker = cluster.fork().process;
 			child_processes[new_worker.pid] = new_worker;
 		});
 		console.log("PARENT pid:", worker.pid);
