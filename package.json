@@ -1,6 +1,6 @@
 {
 	"name" : "opt",
-	"version" : "0.0.6",
+	"version" : "0.0.7",
 	"description" : "A very simple options and configuration processor module for NodeJS command line utilities.",
 	"main" : "./opt.js",
 	"repository" : {
@@ -17,7 +17,7 @@
 		"url" : "https://github.com/rsdoiel"
 	}],
 	"engines" : {
-		"node" : ">= 0.6",
+		"node" : ">= 0.7.12",
 		"npm" : ">= 1"
 	},
 	"dependencies" : {
