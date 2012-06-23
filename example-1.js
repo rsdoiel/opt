@@ -18,7 +18,7 @@ opt.setup("USAGE node example-1.js.",
 	" Released under New the BSD License.\n" +
 	" See: http://opensource.org/licenses/bsd-license.php\n");
 opt.set(["-h", "--help"], opt.usage, "This help document.");
-	
+
 // Parse the command line options
 if (process.argv.length < 3) {
 	console.log("Try using a command line option for demo:\n" + opt.usage());

@@ -18,8 +18,11 @@ Fred's Problem:
 var fs = require("fs"),
 	path = require("path"),
 	opt = require("./opt"),
-	default_config = { name: "fred", "email": "fred@example.com",
-		show_email: false },
+	default_config = { 
+        name: "fred", 
+        email: "fred@example.com",
+		show_email: false 
+    },
 	config = {},
 	config_only = false,
 	config_filename = "";

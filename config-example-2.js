@@ -10,7 +10,7 @@ var config = { name: "fred", "email": "fred@example.com" },
 			"/usr/local/etc/fred.conf",
 			"/usr/etc/fred.conf",
 			"/etc/fred.conf" ];
-	
+
 console.log("Unprocessed config:", config);
 config = opt.config(config, search_paths, function (err, config) {
 	// config should now hold the merge configuration

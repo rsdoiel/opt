@@ -49,7 +49,7 @@ var doTest = function (test_name, func, time_for_test) {
 };
 
 var completedTest = function (test_name) {
-	var self = this, test_remaining;
+	var self = this;
 
 	if (self.Tests === undefined) {
 		throw("self.Tests does not exist.");
@@ -60,7 +60,7 @@ var completedTest = function (test_name) {
 
 var monitorTests = function () {
 	var self = this, test_remaining, 
-		timeout, success_interval_id;
+		timeout;
 
 	if (self.Tests === undefined) {
 		throw("self.Tests does not exist.");
@@ -194,7 +194,7 @@ doTest("Testing configSync()", function (test_name) {
 			break;
 		}
 	});
-	
+
 	// Process when missing search paths.
 	result_config = opt.configSync(test_config);
 	Object.keys(test_config).forEach(function (ky) {
@@ -203,7 +203,7 @@ doTest("Testing configSync()", function (test_name) {
 	Object.keys(result_config).forEach(function (ky) {
 		assert.equal(result_config[ky], test_config[ky], ky + " should match");
 	});
-	
+
 	// Process when missing any config file.
 	result_config = opt.configSync(test_config, ["missing-file.conf"]);
 	Object.keys(test_config).forEach(function (ky) {
@@ -212,16 +212,15 @@ doTest("Testing configSync()", function (test_name) {
 	Object.keys(result_config).forEach(function (ky) {
 		assert.equal(result_config[ky], test_config[ky], ky + " should match");
 	});
-	
+
 	completedTest(test_name);
 });
 
 // Process non-Blocking config
 doTest("Testing config()", function (test_name) {
 	var test_config = { name: "opt", version: "0.0.1" }, 
-		test_paths = ["package.json"],
-		result_config = {};
-	
+		test_paths = ["package.json"];
+
 	opt.config(test_config, test_paths, function (err, result_config) {
 		assert.equal(result_config.name, test_config.name, "Should have name matching.");
 		assert.notEqual(result_config.version, test_config.version, (function (msg) {
@@ -232,7 +231,7 @@ doTest("Testing config()", function (test_name) {
 				JSON.stringify(test_config),
 				msg].join(" ");
 		}("Version should not match.")));
-		
+
 		Object.keys(package_obj).forEach(function(ky) {
 			assert.ok(result_config[ky], "Should have " + ky + " in result_config.");
 			switch (typeof package_obj[ky]) {
@@ -250,7 +249,7 @@ doTest("Testing config()", function (test_name) {
 			}
 		});
 	});
-	
+
 	// Process when missing search paths.
 	opt.config(test_config, test_paths, function (err, result_config) {
 		Object.keys(test_config).forEach(function (ky) {
@@ -270,7 +269,7 @@ doTest("Testing config()", function (test_name) {
 			assert.equal(result_config[ky], test_config[ky], ky + " should match");
 		});
 	});
-	
+
 	completedTest(test_name);
 }, 15);
 

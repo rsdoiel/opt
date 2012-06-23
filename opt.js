@@ -244,7 +244,7 @@
 		};
 
 		scanPaths = function (remaining_paths, callback) {
-			var custom_config = {}, fname, src;
+			var fname;
 
 			if (remaining_paths.length > 0) {
 				fname = remaining_paths.shift();

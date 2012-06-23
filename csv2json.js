@@ -16,8 +16,6 @@ var fs = require("fs"),
 	
 var csv_filename = false, 
 	json_filename = false,
-	structure = {},
-	lines = [],
 	args = [];
 
 opt.setup("USAGE: node " + path.basename(process.argv[1]) + " [options] CSVFILE JSONFILE",
@@ -28,16 +26,16 @@ opt.setup("USAGE: node " + path.basename(process.argv[1]) + " [options] CSVFILE 
         " copyright (c) 2012 all rights reserved\n" +
         " Released under New the BSD License.\n" + 
         " See: http://opensource.org/licenses/bsd-license.php"
-);
+    );
 
 opt.set(["-i", "--input", "--csv"], function (param) {
-        csv_filename = param;
-        opt.consume(param);
+    csv_filename = param;
+    opt.consume(param);
 }, "Set the name of the CSV file to read in. If name is - then read from standard input.");
 
 opt.set(["-o", "--output", "--json"], function (param) {
-		json_filename = param;
-        opt.consume(param);
+	json_filename = param;
+    opt.consume(param);
 }, "Set the of the JSON blob file to output. If name is - then write to standard output.");
 opt.set(["-h", "--help"], opt.usage, "This help page.");
 
@@ -64,8 +62,6 @@ if (json_filename === false && args.length > 3) {
 
 // Main processing function
 (function (csv_filename, json_filename) {
-	var input = [], output = [];
-
 	var fromCSV = function (i, line) {
 		var row;
 		try {
@@ -77,10 +73,10 @@ if (json_filename === false && args.length > 3) {
 		}
 		return row;
 	};
-	
+
 	var toBlobs = function (structure, lines) {
 		var output = [];
-		
+
 		var toBlob = function (line, i) {
 			var blob = {};
 			line.forEach(function (cell, j) {
@@ -93,7 +89,7 @@ if (json_filename === false && args.length > 3) {
 			output.push(JSON.stringify(blob));
 			return blob;
 		};
-		
+
 		lines.forEach(toBlob);
 		return output.join("\n");
 	};
@@ -119,12 +115,12 @@ if (json_filename === false && args.length > 3) {
 
 	if (csv_filename === "-") {
 		(function () {
-			var buf = [], interval_id;
+			var buf = [];
 			process.stdin.resume();
 			process.stdin.on("data", function (chunk) {
 				buf.push(chunk.toString());
 			});
-			
+
 			process.stdin.on("end", function () {
 				csv2json(buf.join(""), json_filename);
 			});

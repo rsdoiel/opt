@@ -71,22 +71,24 @@ opt.parse(process.argv);
 
 
 var parentProcess = function (config) {
-	var child_process = {}, i, worker;
+	var child_processes = {}, i, worker;
+
+    var restart_process = function (worker) {
+        var new_worker, old_pid = worker.pid;
+
+		// Prune the old worker
+		delete child_processes[old_pid];
+
+		console.log("Restarted worker", old_pid, "as", new_worker.pid);			
+		new_worker = cluster.fork().process;
+        child_processes[new_worker.pid] = new_worker;
+    };
 	
 	console.log("PARENT CONFIG:",config);
 	for (i = 0; i < config.numChildren; i += 1) {
 		worker = cluster.fork().process;
-		child_process[worker.pid] = worker;
-		child_process[worker.pid].on("death", function (worker) {
-			var new_worker, old_pid = worker.pid;
-
-			// Prune the old worker
-			delete child_processes[old_pid];
-
-			console.log("Restarted worker", old_pid, "as", new_worker.pid);			
-			new_worker = cluster.fork().process;
-			child_processes[new_worker.pid] = new_worker;
-		});
+		child_processes[worker.pid] = worker;
+		child_processes[worker.pid].on("death", restart_process);
 		console.log("PARENT pid:", worker.pid);
 	}
 };
