@@ -7,13 +7,13 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.6
+// revision: 0.0.8
 //
 
 var fs = require("fs"),
 	util = require("util"),
 	assert = require("assert"),
-	opt = require("./opt");
+	OPT = require("./opt");
 
 var help_has_args = false, 
 	test_args = [ { args : ["testme", "-h", "something else"], help_has_args : true, r : "something else" },
@@ -89,12 +89,14 @@ var monitorTests = function () {
 console.log("Starting (opt_test.js) ... " + new Date());
 
 doTest("opt creation", function (test_name) {
+	var opt = OPT.create();
 	assert.equal(typeof opt.set, "function", "Should see an exported set()");
 	assert.equal(typeof opt.parse, "function", "Should see an exported parse()");
 	completedTest(test_name);
 });
 
 doTest("param processing and help()", function (test_name) {
+	var opt = OPT.create();
 	help = function(next_arg) {
 		if (next_arg) {
 			help_has_args = true;
@@ -114,7 +116,8 @@ doTest("param processing and help()", function (test_name) {
 
 
 doTest("Consumables", function (test_name) {
-	var test_consumable = ["testme", "--database=mydb", "my_rpt"], 
+	var opt = OPT.create(),
+		test_consumable = ["testme", "--database=mydb", "my_rpt"], 
 		test_result,
 		test_database_name = false;
 	
@@ -161,15 +164,15 @@ doTest("Consumables", function (test_name) {
 });
 
 doTest("Testing configSync()", function (test_name) {
-	var test_config = { name: "opt", version: "0.0.1" }, 
+	var opt = OPT.create(), test_config = { name: "opt", version: "0.0.1" }, 
 		test_paths = ["package.json"],
 		result_config = {},
 		package_json = fs.readFileSync("package.json").toString(),
 		package_obj = JSON.parse(package_json);
 	
-	result_config = opt.configSync(test_config, test_paths);
-	assert.equal(result_config.name, test_config.name, "Should have name matching.");
-	assert.notEqual(result_config.version, test_config.version, (function (msg) {
+		result_config = opt.configSync(test_config, test_paths);
+		assert.equal(result_config.name, test_config.name, "Should have name matching.");
+		assert.notEqual(result_config.version, test_config.version, (function (msg) {
 		return [
 			"Result Config:",
 			JSON.stringify(result_config),
@@ -218,7 +221,7 @@ doTest("Testing configSync()", function (test_name) {
 
 // Process non-Blocking config
 doTest("Testing config()", function (test_name) {
-	var test_config = { name: "opt", version: "0.0.1" }, 
+	var opt = OPT.create(), test_config = { name: "opt", version: "0.0.1" }, 
 		test_paths = ["package.json"];
 
 	opt.config(test_config, test_paths, function (err, result_config) {
@@ -272,5 +275,15 @@ doTest("Testing config()", function (test_name) {
 
 	completedTest(test_name);
 }, 15);
+
+doTest("configEvents", function (test_name) {
+	var opt = OPT.create();
+
+	opt.config({}, ["config-example-1.conf"]);
+	opt.on("ready", function (args) {
+		assert.equal(args.greetings, "Hello", "Should have a args.greetings of hello" + util.inspect(args));
+		completedTest(test_name);	
+	});
+});
 
 monitorTests();
