@@ -2,7 +2,7 @@
 // Demo a simple configuration processing
 //
 var path = require("path"),
-	opt = require("./opt");
+	opt = require("./opt").create();
 
 var config = { name: "fred", "email": "fred@example.com" },
 	search_paths = [ "config-example-1.conf",

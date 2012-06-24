@@ -10,7 +10,7 @@
 
 var util = require("util"),
 	path = require("path"),
-	opt = require("./opt"),
+	opt = require("opt").create(),
 	config = {},
 	today = new Date();
 
