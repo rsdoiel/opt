@@ -10,7 +10,7 @@
 "use strict";
 var util = require("util"),
 	path = require("path"),
-	opt = require("./opt").create(),
+	opt = require("opt").create(),
 	config = {},
 	today = new Date();
 

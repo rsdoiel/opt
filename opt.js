@@ -1,5 +1,5 @@
 //
-// opt.js - a very simple command line option parser for NodeJS projects.
+// opt.js - a very simple command line option parser and RESTful parse for NodeJS projects.
 // @author: R. S. Doiel, <rsdoiel@gmail.com>
 // copyright (c) 2011 all rights reserved
 //
@@ -9,19 +9,25 @@
 // revision: 0.0.8
 //
 
-/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true, stupid: true */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var fs = require("fs"),
 	events = require("events"),
-	util = require("util");
+	util = require("util"),
+    url = require("url"),
+    querystring = require("querystring");
 
 
-// setOption = setup an option to be parsed on the command line.
+// option = set an option to be parsed on the command line.
 // arguments are options (e.g. a string or array of command line flags like -h, 
 // --help), a callback and help string. Callback's are passed a single 
 // parameter containing the option's passed value or true if option 
 // takes no parameters.
-var set = function (options, callback, help_message) {
+// @param options {array} a list of options (e.g. -h, --help)
+// @param callback {function} a function to call when option is discovered
+// @param help_message {string} an explanation of the option
+// @return {boolean} true on success, throw exception otherwise
+var option = function (options, callback, help_message) {
 	var i = 0;
 	if (typeof options !== "string" && options.join === undefined) {
 		throw ("Options should be a string or have a join method like array.");
@@ -30,7 +36,7 @@ var set = function (options, callback, help_message) {
 		throw ("Callback must be a function");
 	}
 	if (help_message === undefined) {
-	   help_message = "Option is not documented";
+        help_message = "Option is not documented";
     }
 
 	if (typeof options !== "string") {
@@ -52,8 +58,10 @@ var consume = function (arg) {
 };
 
 
-// Parse the options provided. It does not alter process.argv
-var parse = function (argv) {
+// optionWith the options provided. It does not alter process.argv
+// @param argv {object} usually process.argv
+// @return {object} or {boolean} return true if succesful or the modified argv is consumable is used.
+var optionWith = function (argv) {
 	var self = this, i = 0, output_argv = [], parts;
 
 	if (argv === undefined) {
@@ -90,17 +98,12 @@ var parse = function (argv) {
 	return true;
 };
 
-// Compose the basic command line text description
-var setup = function (heading, synopsis, options, copyright) {
-	// Reset to defaults
-	this.opts = {};
-	this.help_messages = {};
-	this.consumable = [];
-	this.heading = false;
-	this.synopsis = false;
-	this.options = false;
-	this.copyright = false;
-	this.consumable = [];
+// setup how opt with build the basic command line text description.
+// @param heading {string} The heading block as text
+// @param sysnopsis {string} The synopsis block as text
+// @param options {string} The prefix to the options block as text.
+// @param copyright {string} The copyright or credits block as text.
+var setupHelp = function (heading, synopsis, options, copyright) {
 	// Now apply the options
 	this.heading = heading;
 	if (synopsis !== undefined) {
@@ -115,7 +118,9 @@ var setup = function (heading, synopsis, options, copyright) {
 	return true;
 };
 
-// Render opt's setup and exit with an error level
+// Render opt's usage text and exit with an error level
+// @param msg {string} optional message to include in the usage text rendered
+// @param error_level {number} an integer, 0 is no error, greater then zero is an OS level error level.
 var usage = function (msg, error_level) {
 	var self = this, ky, headings = [];
 
@@ -155,7 +160,10 @@ var usage = function (msg, error_level) {
 	if (self.copyright) {
 		console.log(self.copyright);
 	}
-	process.exit(0);
+    if (error_level === undefined) {
+        error_level = 0;
+    }
+	process.exit(error_level);
 };
 
 // Given a default configuration, search the search paths
@@ -163,6 +171,9 @@ var usage = function (msg, error_level) {
 // return a resulting configuration object.	
 // default_config: is an Object
 // search_paths: is an array of search paths
+// @param default_config {object} the default configuration to build from
+// @param search_paths {array} a list of search path to read a configuration file from
+// @return {object} the resolved configuration file
 var configSync = function (default_config, search_paths) {
 	var custom_config = {}, fname, src;
 
@@ -204,6 +215,10 @@ var configSync = function (default_config, search_paths) {
 // return a resulting configuration object.	
 // default_config: is an Object
 // search_paths: is an array of search paths
+// @param default_config {object} the default configuration to build from
+// @param search_paths {array} a list of search path to read a configuration file from
+// @param callback {function} the callbakc to execute after configuration is resolve. 
+// the argument passed the callback is the resolved configuration object.
 var config = function (default_config, search_paths, callback) {
 	var self = this, scanPaths, processPath;
 
@@ -262,33 +277,109 @@ var config = function (default_config, search_paths, callback) {
 };
 
 
-// Return the aggregated help information.
+// help - gets help_messages object.
+// @return {object} the aggregated help information.
 var help = function () {
 	return this.help_messages;
 };
 
+// rest - define a restful interaction
+// @param method {string} this type of method being defined (e.g. GET, POST, DELETE, PUT)
+// @param path_expression {RegExp} a regular expression expression describing the RESTful path
+// @param args {object} the URL parameters (e.g. accepting ?json=1&callback=MyFunc would be defined as {json:"boolean", callback: "string")
+// @param event_name {string} the name of the event to pass the request and respode to.
+var rest = function (method, path_expression, args, event_name) {
+    var re;
+    
+    if (typeof path_expression === "string") {
+        re = new RegExp(path_expression);
+    } else {
+        re = path_expression;
+    }
+    // defined the method list if not previously defined
+    if (this.restful[method] === undefined) {
+        this.restful[method] = [];
+    }
+    // Now add the RegExp, etc. to the method list
+    this.restful[method].push({
+        re: re,
+        args: args,
+        event_name: event_name
+    });
+};
+
+// restWith - process the request and response provided by http.server() against the rest interactions defined.
+var restWith = function (request, response) {
+    var self = this, i, method, url_parts = url.parse(request.url),
+        re_found = false, matching = false;
+    
+    // Get the method requested
+    if (this.restful[request.method] !== undefined) {
+        method = this.restful[request.method];
+    } else {
+        method = {};
+    }
+
+    // Check if path exppression has been defined for that
+    for (i = 0; i < method.length && re_found === false; i += 1) {
+        matching = url_parts.path.match(method[i].re);
+        if (matching) {
+            // Process and trigger event or make callback.
+            self.emit(method[i].event_name, {
+                method: request.method,
+                rule_no: i,
+                event_name: method[i].event_name,
+                matched: matching,
+                request: request,
+                response: response
+            });
+            re_found = true;
+        }
+    }
+
+    if (re_found === false) {
+        self.emit("error", {
+            method: request.method,
+            rule_no: -1,
+            event_name: "error",
+            matched: false,
+            request: request,
+            response: response
+        });
+    }
+    return re_found;
+};
 
 // A constructor to created an EventEmitter
 // version of opt. 
+// @constructor
+// @return {object} a new instance of the Opt object
 var create = function () {
     var Opt = function () {
         this.opts = {};
+        this.restful = {};
         this.help_messages = {};
         this.consumable = [];
         this.heading = false;
         this.synopsis = false;
         this.options = false;
         this.copyright = false;
-        this.configuration = {};
-    
-        this.set = set;
+        this.consumable = [];
+                
+        this.set = option; // set() is depreciated in favaor of option()
+        this.parse = optionWith; // parse() is depreciated in favor of optionWith();
+        this.setup = setupHelp; // setup() is depcreciated in favor of setopHelp();
+
+        this.option = option;
+        this.optionWith = optionWith;
         this.consume = consume;
-        this.parse = parse;
         this.help = help;
-        this.setup = setup;
+        this.setupHelp = setupHelp;
         this.usage = usage;
         this.configSync = configSync;
         this.config = config;
+        this.rest = rest;
+        this.restWith = restWith;
         events.EventEmitter.call(this);
     };
     util.inherits(Opt, events.EventEmitter);
@@ -296,12 +387,19 @@ var create = function () {
 	return new Opt();
 };
 
+exports.set = option; // set() is depreciated in favor of option()
+exports.parse = optionWith; // parse() is depreciated in favor of optionWith()
+exports.setup = setupHelp; // setup() is depreciated in favor of setupHelp()
+
+
 exports.create = create;
-exports.set = set;
+exports.option = option;
+exports.optionWith = optionWith;
+exports.rest = rest;
+exports.restWith = restWith;
 exports.consume = consume;
-exports.parse = parse;
 exports.help = help;
-exports.setup = setup;
+exports.setupHelp = setupHelp;
 exports.usage = usage;
 exports.configSync = configSync;
 exports.config = config;

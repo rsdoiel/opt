@@ -17,7 +17,7 @@ Fred's Problem:
 
 var fs = require("fs"),
 	path = require("path"),
-	opt = require("./opt").create(),
+	opt = require("opt").create(),
 	default_config = {
         name: "fred",
         email: "fred@example.com",

@@ -1,6 +1,6 @@
 opt
 ===
-revision 0.0.7
+revision 0.0.8
 --------------
 
 # Overview
@@ -11,25 +11,28 @@ configuration file.
 
 # Config Example 1
 
-This is the synchronous version
+This is the synchronous version.
 
 	var path = require('path'),
 		opt = require('opt').create();
 	
-	var config = { name: "fred", "email": "fred@example.com" },
-		search_paths = [ "config-example-1.conf",
-				path.join(process.env.HOME, ".fredrc"),
-				"/usr/local/etc/fred.conf",
-				"/usr/etc/fred.conf",
-				"/etc/fred.conf" ];
-		
-	console.log("Unprocessed config:", config);
-	config = opt.configSync(config, search_paths);
-	
-	// config should now hold the merge configuration
-	// from default_config and the first configuration file 
-	// found in the search path list.
-	console.log("Processed config: ", config);
+	var config = { 
+            name: "fred", 
+            "email": "fred@example.com" 
+        },
+		search_paths = [
+            "config-example-1.conf",
+            path.join(process.env.HOME, ".fredrc"),
+            "/usr/local/etc/fred.conf",
+            "/usr/etc/fred.conf",
+            "/etc/fred.conf" 
+        ];
+    console.log("Unprocessed config:", config);
+    config = opt.configSync(config, search_paths);
+    // config should now hold the merge configuration
+    // from default_config and the first configuration file 
+    // found in the search path list.
+    console.log("Processed config: ", config);
 
 
 # Config Example 2
@@ -39,12 +42,17 @@ This is the asynchronous version
 	var path = require('path'),
 		opt = require('opt').create();
 	
-	var config = { name: "fred", "email": "fred@example.com" },
-		search_paths = [ "config-example-1.conf",
-				path.join(process.env.HOME, ".fredrc"),
-				"/usr/local/etc/fred.conf",
-				"/usr/etc/fred.conf",
-				"/etc/fred.conf" ];
+	var config = { 
+            name: "fred", 
+            "email": "fred@example.com"
+        },
+		search_paths = [ 
+            "config-example-1.conf",
+			path.join(process.env.HOME, ".fredrc"),
+			"/usr/local/etc/fred.conf",
+			"/usr/etc/fred.conf",
+			"/etc/fred.conf" 
+        ];
 
 	console.log("Unprocessed config:", config);
 	config = opt.config(config, search_paths, function (err, config) {
@@ -62,20 +70,25 @@ This is an asynchronous version using a ready event.
 	var path = require("path"),
 		opt = require("./opt").create();
 
-	var config = { name: "fred", "email": "fred@example.com" },
-		search_paths = [ "config-example-1.conf",
-				path.join(process.env.HOME, ".fredrc"),
-				"/usr/local/etc/fred.conf",
-				"/usr/etc/fred.conf",
-				"/etc/fred.conf" ];
+	var config = { 
+            name: "fred", 
+            "email": "fred@example.com"
+        },
+		search_paths = [
+            "config-example-1.conf",
+            path.join(process.env.HOME, ".fredrc"),
+            "/usr/local/etc/fred.conf",
+            "/usr/etc/fred.conf",
+            "/etc/fred.conf" 
+        ];
 
 	console.log("Unprocessed config:", config);
 	opt.config(config, search_paths);
 
 	opt.on("ready", function (config) {
-		// config should now hold the merge configuration
-		// from default_config and the first configuration file 
-		// found in the search path list.
+        // config should now hold the merge configuration
+        // from default_config and the first configuration file
+        // found in the search path list. 
 		console.log("Processed config: ", config);
 	});
 
