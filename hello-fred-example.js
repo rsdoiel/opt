@@ -2,41 +2,41 @@
 // hello-fred-example.js - demonstrate supporting a configuration file
 // with command line overrides.
 //
+"use strict";
 
 /*
 Fred's Problem:
-	
+
 	Fred wants a command line tool to say hello and optionally remind him
 	of his email address. Fred likes configuration files but sometimes he
 	stores them in different places (e.g. $HOME/fred.cnf,
-	/usr/etc/fred.cnf, and /etc/fred.cnf).  Fred make lots of typos so he 
+	/usr/etc/fred.cnf, and /etc/fred.cnf).  Fred make lots of typos so he
 	would like to setup the configuration with this program and generate a
 	valid JSON file based in it.
-	
 */
 
 var fs = require("fs"),
 	path = require("path"),
 	opt = require("opt").create(),
-	default_config = { 
-        name: "fred", 
+	default_config = {
+        name: "fred",
         email: "fred@example.com",
-		show_email: false 
+		show_email: false
     },
 	config = {},
 	config_only = false,
 	config_filename = "";
 
-// Check a search path and pickup the first configuration file found	
-config = opt.configSync( default_config, [
-				path.join(process.env.HOME, "fred.cnf"),
-				"/usr/etc/fred.cnf",
-				"/etc/fred.cnf" 
-			]);
+// Check a search path and pickup the first configuration file found
+config = opt.configSync(default_config, [
+	path.join(process.env.HOME, "fred.cnf"),
+	"/usr/etc/fred.cnf",
+	"/etc/fred.cnf"
+]);
 
 // Setup some helpful command line info	
 opt.setup("USAGE node " + path.basename(process.argv[1]),
-		"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node " + 
+		"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node " +
 				path.basename(process.argv[1]) + " --email",
 		"OPTIONS",
 		" copyright (c) 2012 all rights reserved\n" +
@@ -81,7 +81,7 @@ if (config_only === true) {
 	if (config_filename === "") {
 		console.log(JSON.stringify(config));
 	} else {
-		fs.writeFile(config_filename, JSON.stringify(config), 
+		fs.writeFile(config_filename, JSON.stringify(config),
 			function (err) {
 				if (err) {
 					console.error("ERROR: can't write", config_filename);

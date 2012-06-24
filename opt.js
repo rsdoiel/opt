@@ -15,29 +15,6 @@ var fs = require("fs"),
 	events = require("events"),
 	util = require("util");
 
-var Opt = function () {
-	this.opts = {};
-	this.help = {};
-	this.consumable = [];
-	this.heading = false;
-	this.synopsis = false;
-	this.options = false;
-	this.copyright = false;
-	this.configuration = {};
-	
-	this.set = set;
-	this.consume = consume;
-	this.parse = parse;
-	this.help = help;
-	this.setup = setup;
-	this.usage = usage;
-	this.configSync = configSync;
-	this.config = config;
-	events.EventEmitter.call(this);
-};
-util.inherits(Opt, events.EventEmitter);
-
-
 // setOption = setup an option to be parsed on the command line.
 // arguments are options (e.g. a string or array of command line flags like -h, 
 // --help), a callback and help string. Callback's are passed a single 
@@ -288,6 +265,29 @@ var config = function (default_config, search_paths, callback) {
 	// or have exhausted our search.
 	scanPaths(search_paths, callback);
 };
+
+
+var Opt = function () {
+	this.opts = {};
+	this.help = {};
+	this.consumable = [];
+	this.heading = false;
+	this.synopsis = false;
+	this.options = false;
+	this.copyright = false;
+	this.configuration = {};
+
+	this.set = set;
+	this.consume = consume;
+	this.parse = parse;
+	this.help = help;
+	this.setup = setup;
+	this.usage = usage;
+	this.configSync = configSync;
+	this.config = config;
+	events.EventEmitter.call(this);
+};
+util.inherits(Opt, events.EventEmitter);
 
 
 // A constructor to created an EventEmitter

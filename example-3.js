@@ -2,6 +2,7 @@
 // Show the use of consumable args and rendering a resulting
 // argv from opt.parse(process.argv).
 //
+"use strict";
 
 /* Example output:
 example.com:  node example-3.js one two

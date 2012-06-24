@@ -2,6 +2,8 @@
 // Demo a simple asynchronous configuration processing
 // using a ready event.
 //
+"use strict";
+
 var path = require("path"),
 	opt = require("./opt").create();
 
