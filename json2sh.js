@@ -11,7 +11,7 @@
 
 var fs = require("fs"),
 	path = require("path"),
-	opt = require("opt"),
+	opt = require("opt").create(),
 	input = "",
 	output = "", fields = {}, buf;
 

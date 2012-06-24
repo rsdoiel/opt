@@ -1,6 +1,6 @@
 opt
 ===
-revision 0.0.6
+revision 0.0.7
 --------------
 
 # Overview
@@ -14,7 +14,7 @@ configuration file.
 This is the synchronous version
 
 	var path = require('path'),
-		opt = require('./opt');
+		opt = require('opt').create();
 	
 	var config = { name: "fred", "email": "fred@example.com" },
 		search_paths = [ "config-example-1.conf",
@@ -37,7 +37,7 @@ This is the synchronous version
 This is the asynchronous version
 
 	var path = require('path'),
-		opt = require('./opt');
+		opt = require('opt').create();
 	
 	var config = { name: "fred", "email": "fred@example.com" },
 		search_paths = [ "config-example-1.conf",
@@ -62,7 +62,7 @@ Display a help message with -h and --help on the command line.
 Source code example-1.js
 
 	var util = require('util'),
-		opt = require('./opt');
+		opt = require('opt').create();
 	
 	opt.setup("USAGE node example-1.js.",
 		"SYNOPSIS\n\n\t\tDemon straight how opt works: node example-1.js --help",
@@ -82,7 +82,7 @@ Source code example-2.js
 
 	var util = require('util'),
 		path = require('path'),
-		opt = require('./opt'),
+		opt = require('opt').create(),
 		config = {},
 		today = new Date();
 	
@@ -134,7 +134,7 @@ Source code json2sh.js
 
 	var fs = require('fs'),
 		path = require('path'),
-		opt = require('opt'),
+		opt = require('opt').create(),
 		input = '',
 		output = '', fields = {}, buf;
 	
@@ -175,7 +175,7 @@ Source code: example-3.js
 
 	var util = require("util"),
 			path = require("path"),
-			opt = require("./opt"),
+			opt = require("opt").create(),
 			input_name = false,
 			output_name = false,
 			database_name = false,
@@ -221,7 +221,7 @@ Source Code: csv2json.js
 
 	var fs = require('fs'),
 		path = require('path'),
-		opt = require('opt');
+		opt = require('opt').create();
 		
 	var csv_filename = false, 
 		json_filename = false,
@@ -360,7 +360,7 @@ Using opt with the cluster module to configure parent and children.
 		cluster = require("cluster"),
 		os = require("os");
 	
-	var opt = require("opt");
+	var opt = require("opt").create();
 		
 	var config = { port: 80, host: "localhost", numChildren: (os.cpus().length || 2) },
 		config_name = path.basename(process.argv[1], 

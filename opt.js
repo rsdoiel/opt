@@ -6,267 +6,303 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.6
+// revision: 0.0.8
 //
 
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true, stupid: true */
 
-(function () {
-	var fs = require("fs");
+var fs = require("fs"),
+	events = require("events"),
+	util = require("util");
 
-	var	self = {
-			opts: {},
-			help: {},
-			consumable: [],
-			heading : false,
-			synopsis : false,
-			options: false,
-			copyright: false,
-			configuration: {}
-		};
+var Opt = function () {
+	this.opts = {};
+	this.help = {};
+	this.consumable = [];
+	this.heading = false;
+	this.synopsis = false;
+	this.options = false;
+	this.copyright = false;
+	this.configuration = {};
+	
+	this.set = set;
+	this.consume = consume;
+	this.parse = parse;
+	this.help = help;
+	this.setup = setup;
+	this.usage = usage;
+	this.configSync = configSync;
+	this.config = config;
+	events.EventEmitter.call(this);
+};
+util.inherits(Opt, events.EventEmitter);
 
-	// setOption = setup an option to be parsed on the command line.
-	// arguments are options (e.g. a string or array of command line flags like -h, 
-	// --help), a callback and help string. Callback's are passed a single 
-	// parameter containing the option's passed value or true if option 
-	// takes no parameters.
-	var set = function (options, callback, help) {
-		var i = 0;
-		if (typeof options !== "string" && options.join === undefined) {
-			throw ("Options should be a string or have a join method like array.");
+
+// setOption = setup an option to be parsed on the command line.
+// arguments are options (e.g. a string or array of command line flags like -h, 
+// --help), a callback and help string. Callback's are passed a single 
+// parameter containing the option's passed value or true if option 
+// takes no parameters.
+var set = function (options, callback, help) {
+	var self = this, i = 0;
+	if (typeof options !== "string" && options.join === undefined) {
+		throw ("Options should be a string or have a join method like array.");
+	}
+	if (typeof callback !== "function") {
+		throw ("Callback must be a function");
+	}
+	if (help === undefined) { help = "Option is not documented"; }
+
+	if (typeof options !== "string") {
+		for (i = 0; i < options.length; i += 1) {
+			self.opts[options[i]] = callback;
 		}
-		if (typeof callback !== "function") {
-			throw ("Callback must be a function");
-		}
-		if (help === undefined) { help = "Option is not documented"; }
+		self.help[options.join(", ")] = help;
+	} else {
+		self.opts[options] = callback;
+		self.help[options] = help;
+	}
+	return true;
+};
 
-		if (typeof options !== "string") {
-			for (i = 0; i < options.length; i += 1) {
-				self.opts[options[i]] = callback;
-			}
-			self.help[options.join(", ")] = help;
-		} else {
-			self.opts[options] = callback;
-			self.help[options] = help;
-		}
-		return true;
-	};
-
-	// consume - removing an argument from the processed argument returned
-	// by self.parse().
-	var consume = function (arg) {
-		self.consumable.push(arg);
-	};
+// consume - removing an argument from the processed argument returned
+// by self.parse().
+var consume = function (arg) {
+	var self = this;
+	self.consumable.push(arg);
+};
 
 
-	// Parse the options provided. It does not alter process.argv
-	var parse = function (argv) {
-		var i = 0, output_argv = [], parts;
+// Parse the options provided. It does not alter process.argv
+var parse = function (argv) {
+	var self = this, i = 0, output_argv = [], parts;
 
-		if (argv === undefined) {
-			argv = process.argv;
-		}
+	if (argv === undefined) {
+		argv = process.argv;
+	}
 
-		// loop through command line and process args with callbacks.
-		for (i = 0; i < argv.length; i += 1) {
-			parts = argv[i].split("=");
-			if (typeof self.opts[parts[0]] === "function") {
-				// Check to see if we need split at = or pass next arg.
-				if (parts.length === 2) {
-					if (parts[1][0] === '"' || parts[1][0] === "'") {
-						self.opts[parts[0]](parts[1].substring(1, parts[1].length - 1));
-					} else {
-						self.opts[parts[0]](parts[1]);
-					}
-				} else if ((i + 1) < argv.length && self.opts[argv[i + 1]] === undefined) {
-					self.opts[parts[0]](argv[i + 1]);
+	// loop through command line and process args with callbacks.
+	for (i = 0; i < argv.length; i += 1) {
+		parts = argv[i].split("=");
+		if (typeof self.opts[parts[0]] === "function") {
+			// Check to see if we need split at = or pass next arg.
+			if (parts.length === 2) {
+				if (parts[1][0] === '"' || parts[1][0] === "'") {
+					self.opts[parts[0]](parts[1].substring(1, parts[1].length - 1));
 				} else {
-					self.opts[parts[0]]();
+					self.opts[parts[0]](parts[1]);
 				}
-			}
-		}
-
-		if (self.consumable.length > 0) {
-			argv.forEach(function (arg) {
-				if (arg.indexOf("-") !== 0 && self.consumable.indexOf(arg) === -1) {
-					output_argv.push(arg);
-				}
-			});
-			return output_argv;
-		}
-		return true;
-	};
-
-	// Return the aggregated help information.
-	var help = function () {
-		return self.help;
-	};
-
-	// Compose the basic command line text description
-	var setup = function (heading, synopsis, options, copyright) {
-		// Reset to defaults
-		self.opts = {};
-		self.help = {};
-		self.consumable = [];
-		self.heading = false;
-		self.synopsis = false;
-		self.options = false;
-		self.copyright = false;
-		self.consumable = [];
-		// Now apply the options
-		self.heading = heading;
-		if (synopsis !== undefined) {
-			self.synopsis = synopsis;
-		}
-		if (options !== undefined) {
-			self.options = options;
-		}
-		if (copyright !== undefined) {
-			self.copyright = copyright;
-		}
-		return true;
-	};
-
-	// Render opt's setup and exit with an error level
-	var usage = function (msg, error_level) {
-		var ky, headings = [];
-
-		if (self.heading) {
-			headings.push("\n " + self.heading);
-		}
-
-		if (error_level !== undefined) {
-			console.error(headings.join("\n\n "));
-			if (self.copyright) {
-				console.error(self.copyright);
-			}
-			if (msg !== undefined) {
-				console.error(" " + msg + "\n");
+			} else if ((i + 1) < argv.length && self.opts[argv[i + 1]] === undefined) {
+				self.opts[parts[0]](argv[i + 1]);
 			} else {
-				console.error("ERROR: process exited with an error " + error_level);
+				self.opts[parts[0]]();
 			}
-			process.exit(error_level);
 		}
+	}
 
-		if (self.synopsis) {
-			headings.push(self.synopsis);
-		}
-		if (self.options) {
-			headings.push(self.options);
-		}
-
-		console.log(headings.join("\n\n "));
-		self.help.forEach(function (ky) {
-			console.log("\t" + ky + "\t\t" + self.help[ky]);
+	if (self.consumable.length > 0) {
+		argv.forEach(function (arg) {
+			if (arg.indexOf("-") !== 0 && self.consumable.indexOf(arg) === -1) {
+				output_argv.push(arg);
+			}
 		});
-		console.log("\n\n");
-		if (msg !== undefined) {
-			console.log(" " + msg + "\n");
-		}
+		return output_argv;
+	}
+	return true;
+};
 
+// Return the aggregated help information.
+var help = function () {
+	var self = this;
+	return self.help;
+};
+
+// Compose the basic command line text description
+var setup = function (heading, synopsis, options, copyright) {
+	var self = this;
+	// Reset to defaults
+	self.opts = {};
+	self.help = {};
+	self.consumable = [];
+	self.heading = false;
+	self.synopsis = false;
+	self.options = false;
+	self.copyright = false;
+	self.consumable = [];
+	// Now apply the options
+	self.heading = heading;
+	if (synopsis !== undefined) {
+		self.synopsis = synopsis;
+	}
+	if (options !== undefined) {
+		self.options = options;
+	}
+	if (copyright !== undefined) {
+		self.copyright = copyright;
+	}
+	return true;
+};
+
+// Render opt's setup and exit with an error level
+var usage = function (msg, error_level) {
+	var self = this, ky, headings = [];
+
+	if (self.heading) {
+		headings.push("\n " + self.heading);
+	}
+
+	if (error_level !== undefined) {
+		console.error(headings.join("\n\n "));
 		if (self.copyright) {
-			console.log(self.copyright);
+			console.error(self.copyright);
 		}
-		process.exit(0);
-	};
-
-	// Given a default configuration, search the search paths
-	// for JSON file on disc with custom configuration.
-	// return a resulting configuration object.	
-	// default_config: is an Object
-	// search_paths: is an array of search paths
-	var configSync = function (default_config, search_paths) {
-		var custom_config = {}, fname, src;
-
-		if (search_paths !== undefined && search_paths.shift !== undefined) {
-			fname = search_paths.shift();
+		if (msg !== undefined) {
+			console.error(" " + msg + "\n");
 		} else {
-			fname = false;
+			console.error("ERROR: process exited with an error " + error_level);
 		}
-		while (fname) {
-			try {
-				src = fs.readFileSync(fname).toString();
-			} catch (err) {
-				src = "";
-			}
-			if (src) {
-				fname = false;
-				custom_config = JSON.parse(src);
-			} else {
-				fname = search_paths.shift();
-			}
-		}
+		process.exit(error_level);
+	}
 
+	if (self.synopsis) {
+		headings.push(self.synopsis);
+	}
+	if (self.options) {
+		headings.push(self.options);
+	}
+
+	console.log(headings.join("\n\n "));
+	self.help.forEach(function (ky) {
+		console.log("\t" + ky + "\t\t" + self.help[ky]);
+	});
+	console.log("\n\n");
+	if (msg !== undefined) {
+		console.log(" " + msg + "\n");
+	}
+
+	if (self.copyright) {
+		console.log(self.copyright);
+	}
+	process.exit(0);
+};
+
+// Given a default configuration, search the search paths
+// for JSON file on disc with custom configuration.
+// return a resulting configuration object.	
+// default_config: is an Object
+// search_paths: is an array of search paths
+var configSync = function (default_config, search_paths) {
+	var self = this, custom_config = {}, fname, src;
+
+	if (search_paths !== undefined && search_paths.shift !== undefined) {
+		fname = search_paths.shift();
+	} else {
+		fname = false;
+	}
+	while (fname) {
+		try {
+			src = fs.readFileSync(fname).toString();
+		} catch (err) {
+			src = "";
+		}
 		if (src) {
-			// Override the default config with the custom configuration
+			fname = false;
+			custom_config = JSON.parse(src);
+		} else {
+			fname = search_paths.shift();
+		}
+	}
+
+	if (src) {
+		// Override the default config with the custom configuration
+		Object.keys(default_config).forEach(function (ky) {
+			if (custom_config[ky] === undefined) {
+				custom_config[ky] = default_config[ky];
+			}
+		});
+	} else {
+		custom_config = default_config;
+	}
+
+	return custom_config;
+};
+
+// Given a default configuration, search the search paths
+// for JSON file on disc with custom configuration.
+// return a resulting configuration object.	
+// default_config: is an Object
+// search_paths: is an array of search paths
+var config = function (default_config, search_paths, callback) {
+	var self = this, scanPaths, processPath;
+
+	// Recursive attempt to read the configuration
+	processPath = function (fname, remaining_paths, callback) {
+		fs.readFile(fname, function (err, buf) {
+			var custom_config;
+			if (err || buf.length === 0) {
+				scanPaths(remaining_paths, callback);
+				return;
+			}
+			try {
+				custom_config = JSON.parse(buf.toString());
+			} catch (json_error) {
+				// We've found a config file, but there's an problem.
+				if (callback) {
+					callback({fname: fname, error_msg: json_error}, null);
+				} else {
+					self.emit("error", {fname: fname, error_msg: json_error});
+				}
+				return;
+			}
 			Object.keys(default_config).forEach(function (ky) {
 				if (custom_config[ky] === undefined) {
 					custom_config[ky] = default_config[ky];
 				}
 			});
-		} else {
-			custom_config = default_config;
-		}
-
-		return custom_config;
-	};
-
-	// Given a default configuration, search the search paths
-	// for JSON file on disc with custom configuration.
-	// return a resulting configuration object.	
-	// default_config: is an Object
-	// search_paths: is an array of search paths
-	var config = function (default_config, search_paths, callback) {
-		var scanPaths, processPath;
-
-		// Recursive attempt to read the configuration
-		processPath = function (fname, remaining_paths, callback) {
-			fs.readFile(fname, function (err, buf) {
-				var custom_config;
-				if (err || buf.length === 0) {
-					scanPaths(remaining_paths, callback);
-					return;
-				}
-				try {
-					custom_config = JSON.parse(buf.toString());
-				} catch (json_error) {
-					// We've found a config file, but there's an problem.
-					callback({fname: fname, error_msg: json_error}, null);
-					return;
-				}
-				Object.keys(default_config).forEach(function (ky) {
-					if (custom_config[ky] === undefined) {
-						custom_config[ky] = default_config[ky];
-					}
-				});
+			if (callback) {
 				callback(null, custom_config);
-			});
-		};
-
-		scanPaths = function (remaining_paths, callback) {
-			var fname;
-
-			if (remaining_paths.length > 0) {
-				fname = remaining_paths.shift();
-				processPath(fname, remaining_paths, callback);
 			} else {
-				// we've search everyone where so
-				// return the default config.
-				callback(null, default_config);
+				self.emit("ready", custom_config);
 			}
-		};
-
-		// Scan the path list until we have a config
-		// or have exhausted our search.
-		scanPaths(search_paths, callback);
+		});
 	};
 
-	exports.set = set;
-	exports.consume = consume;
-	exports.parse = parse;
-	exports.help = help;
-	exports.setup = setup;
-	exports.usage = usage;
-	exports.configSync = configSync;
-	exports.config = config;
-}());
+	scanPaths = function (remaining_paths, callback) {
+		var fname;
+
+		if (remaining_paths.length > 0) {
+			fname = remaining_paths.shift();
+			processPath(fname, remaining_paths, callback);
+		} else {
+			// we've search everywhere so
+			// return the default config.
+			if (callback) {
+				callback(null, default_config);
+			} else {
+				self.emit("ready", default_config);
+			}
+		}
+	};
+
+	// Scan the path list until we have a config
+	// or have exhausted our search.
+	scanPaths(search_paths, callback);
+};
+
+
+// A constructor to created an EventEmitter
+// version of opt. 
+var create = function () {
+	return new Opt();
+};
+
+exports.Opt = Opt;
+exports.create = create;
+exports.set = set;
+exports.consume = consume;
+exports.parse = parse;
+exports.help = help;
+exports.setup = setup;
+exports.usage = usage;
+exports.configSync = configSync;
+exports.config = config;
