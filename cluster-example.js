@@ -7,7 +7,7 @@ var fs = require("fs"),
 	cluster = require("cluster"),
 	os = require("os");
 
-var opt = require("opt");
+var opt = require("opt").create();
 	
 var config = { port: 80, host: "localhost", numChildren: (os.cpus().length || 2) },
 	config_name = path.basename(process.argv[1], 
