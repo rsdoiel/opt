@@ -16,11 +16,9 @@
 var fs = require("fs"),
     path = require("path"),
     cluster = require("cluster"),
-    os = require("os");
-
-var opt = require("opt").create();
-
-var config = {
+    os = require("os"),
+    opt = require("./opt").create(),
+    config = {
         port: 80,
         host: "localhost",
         numChildren: (os.cpus().length || 2)
@@ -36,7 +34,7 @@ config = opt.configSync(config, [
 ]);
 
 opt.setup("USAGE node " + path.basename(process.argv[1]),
-    "SYNOPSIS: demo of using opt and cluster module together\n" +
+    "SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n " +
     "OPTIONS",
     "Copyright notice would go here.");
 
@@ -46,7 +44,7 @@ opt.set(["-t", "--threads"], function (param) {
     } else {
         opt.usage("threads must be number greater then two.", 1);
     }
-}, "Set the number of web server threads to run.");
+}, "Set the number of service threads to run.");
 
 opt.set(["-H", "--host"], function (param) {
     if (param.trim()) {
@@ -80,7 +78,9 @@ opt.set(["-g", "--generate"], function (param) {
     process.exit(0);
 }, "Generate a configuration file from current command line options. This should be the last option specified.");
 
-opt.set(['-h', '--help'], opt.usage, "This help document.");
+opt.set(['-h', '--help'], function () {
+    opt.usage();
+}, "This help document.");
 
 opt.parse(process.argv);
 

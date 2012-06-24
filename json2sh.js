@@ -12,7 +12,7 @@
 
 var fs = require("fs"),
     path = require("path"),
-    opt = require("opt").create(),
+    opt = require("./opt").create(),
     input = "",
     output = "",
     fields = {},
@@ -27,7 +27,9 @@ opt.setup("USAGE: node " + path.basename(process.argv[1]) + " --input=JSON_FILEN
     " See: http://opensource.org/licenses/bsd-license.php"
 	);
 
-opt.set(["-h", "--help"], opt.usage, "This help page.");
+opt.set(["-h", "--help"], function () {
+    opt.usage();
+}, "This help page.");
 opt.set(["-i", "--input"], function (param) {
     input = param;
 }, "Set the name of the JSON file to read.");
@@ -44,7 +46,11 @@ buf = [
     "#"
 ];
 Object.keys(fields).forEach(function (ky) {
-    buf.push(String(ky).toUpperCase() + "=\"" + fields[ky].trim() + "\"");
+    buf.push(String(ky).toUpperCase() + "=\"" + fields[ky].toString().trim() + "\"");
 });
 buf.push("\n");
-fs.writeFileSync(output, buf.join("\n"));
+if (output !== "") {
+    fs.writeFileSync(output, buf.join("\n"));
+} else {
+    console.log(buf.join("\n"));
+}

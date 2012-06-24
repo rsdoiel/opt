@@ -10,7 +10,7 @@
 "use strict";
 var util = require("util"),
 	path = require("path"),
-	opt = require("opt").create(),
+	opt = require("./opt").create(),
 	config = {},
 	today = new Date();
 
@@ -20,7 +20,9 @@ opt.setup("USAGE:  node " + path.basename(process.argv[1]) + " --help",
 	" copyright (c) 2011 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
 	" See: http://opensource.org/licenses/bsd-license.php\n");
-opt.set(["-h", "--help"], opt.usage, "This help document.");
+opt.set(["-h", "--help"], function () {
+    opt.usage();
+}, "This help document.");
 
 opt.set(["-f", "--first-name"], function (first_name) {
 	config.first_name = first_name;

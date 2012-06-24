@@ -43,7 +43,7 @@ Collection name: two-collection
 
 var util = require("util"),
 	path = require("path"),
-	opt = require("opt").create(),
+	opt = require("./opt").create(),
 	input_name = false,
 	output_name = false,
 	database_name = false,
@@ -71,7 +71,9 @@ opt.set(["-i", "--input"], function (param) {
 });
 opt.set(["-o", "--output"], function (param) {
 }, "Set the output name.");
-opt.set(["-h", "--help"], opt.usage, "This help page.");
+opt.set(["-h", "--help"], function () {
+    opt.usage();
+}, "This help page.");
 
 new_args = opt.parse(process.argv);
 if (new_args[1] !== undefined) {

@@ -92,7 +92,9 @@ Source code example-1.js
 	opt.setup("USAGE node example-1.js.",
 		"SYNOPSIS\n\n\t\tDemon straight how opt works: node example-1.js --help",
 		"OPTIONS");
-	opt.set(['-h','--help'], opt.usage, "This help document.");
+	opt.set(['-h','--help'], function () {
+		opt.usage();
+	}, "This help document.");
 		
 	// Parse the command line options
 	if (process.argv.length < 3) {
@@ -415,7 +417,7 @@ Using opt with the cluster module to configure parent and children.
 		} else {
 			opt.usage("threads must be number greater then two.", 1);
 		}
-	}, "Set the number of web server threads to run.");
+	}, "Set the number of service threads to run.");
 	
 	opt.set(["-H", "--host"], function (param) {
 		if (param.trim()) {
@@ -449,7 +451,9 @@ Using opt with the cluster module to configure parent and children.
 		process.exit(0);
 	}, "Generate a configuration file from current command line options. This should be the last option specified.");
 
-	opt.set(['-h', '--help'], opt.usage, "This help document.");
+	opt.set(['-h', '--help'], function () {
+		opt.usage();
+	}, "This help document.");
 
 	opt.parse(process.argv);
 

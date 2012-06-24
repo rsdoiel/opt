@@ -13,7 +13,7 @@
 
 var fs = require("fs"),
     path = require("path"),
-    opt = require("opt").create();
+    opt = require("./opt").create();
 
 var csv_filename = false,
     json_filename = false,
@@ -38,7 +38,9 @@ opt.set(["-o", "--output", "--json"], function (param) {
     json_filename = param;
     opt.consume(param);
 }, "Set the of the JSON blob file to output. If name is - then write to standard output.");
-opt.set(["-h", "--help"], opt.usage, "This help page.");
+opt.set(["-h", "--help"], function () {
+    opt.usage();
+}, "This help page.");
 
 args = opt.parse(process.argv);
 

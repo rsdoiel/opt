@@ -9,7 +9,7 @@
 //
 // revision: 0.0.7
 //
-"use strict";
+//"use strict";
 
 var fs = require("fs"),
     util = require("util"),

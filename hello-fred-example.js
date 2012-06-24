@@ -17,7 +17,7 @@ Fred's Problem:
 
 var fs = require("fs"),
 	path = require("path"),
-	opt = require("opt").create(),
+	opt = require("./opt").create(),
 	default_config = {
         name: "fred",
         email: "fred@example.com",
@@ -69,7 +69,9 @@ opt.set(["-g", "--generate"], function (param) {
 	opt.consume(param);
 }, "Generate a configuration JSON expression. Optionally save it to a file.");
 
-opt.set(["-h", "--help"], opt.usage, "This help document.");
+opt.set(["-h", "--help"], function () {
+    opt.usage();
+}, "This help document.");
 
 // Process the command line arguments
 opt.parse(process.argv);
