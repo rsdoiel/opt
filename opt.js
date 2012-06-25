@@ -288,7 +288,8 @@ var help = function () {
 // @param path_expression {RegExp} a regular expression expression describing the RESTful path
 // @param args {object} the URL parameters (e.g. accepting ?json=1&callback=MyFunc would be defined as {json:"boolean", callback: "string")
 // @param event_name {string} the name of the event to pass the request and respode to.
-var rest = function (method, path_expression, args, event_name) {
+// @param help_message - short documentation string for RESTful help page.
+var rest = function (method, path_expression, args, event_name, help_message) {
     var re;
     
     if (typeof path_expression === "string") {
