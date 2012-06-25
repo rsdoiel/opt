@@ -2,17 +2,18 @@
 // hello-fred-example.js - demonstrate supporting a configuration file
 // with command line overrides.
 //
+/*jslint node: true */
 "use strict";
 
 /*
 Fred's Problem:
 
-	Fred wants a command line tool to say hello and optionally remind him
-	of his email address. Fred likes configuration files but sometimes he
-	stores them in different places (e.g. $HOME/fred.cnf,
-	/usr/etc/fred.cnf, and /etc/fred.cnf).  Fred make lots of typos so he
-	would like to setup the configuration with this program and generate a
-	valid JSON file based in it.
+> Fred wants a command line tool to say hello and optionally remind him
+> of his email address. Fred likes configuration files but sometimes he
+> stores them in different places (e.g. $HOME/fred.cnf,
+> /usr/etc/fred.cnf, and /etc/fred.cnf).  Fred make lots of typos so he
+> would like to setup the configuration with this program and generate a
+> valid JSON file based in it.
 */
 
 var fs = require("fs"),
@@ -35,7 +36,7 @@ config = opt.configSync(default_config, [
 ]);
 
 // Setup some helpful command line info	
-opt.setup("USAGE node " + path.basename(process.argv[1]),
+opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
 		"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node " +
 				path.basename(process.argv[1]) + " --email",
 		"OPTIONS",
@@ -44,7 +45,7 @@ opt.setup("USAGE node " + path.basename(process.argv[1]),
 		" See: http://opensource.org/licenses/bsd-license.php\n");
 
 // Use a specific configuration file
-opt.set(["-c", "--config"], function (config_filename) {
+opt.option(["-c", "--config"], function (config_filename) {
 	if (config_filename) {
 		config = opt.configSync(default_config, [config_filename]);
 		opt.consume(config_filename);
@@ -52,16 +53,16 @@ opt.set(["-c", "--config"], function (config_filename) {
 }, "Use a specific configuration file");
 
 // Optionally show Fred's email address
-opt.set(["-e", "--email"], function () {
+opt.option(["-e", "--email"], function () {
 	config.show_email = true;
 }, "Show the email address.");
 
-opt.set(["-E", "--no-email"], function () {
+opt.option(["-E", "--no-email"], function () {
 	config.show_email = false;
 }, "Don't show the email address.");
 
 // Generate and write a configuration file.
-opt.set(["-g", "--generate"], function (param) {
+opt.option(["-g", "--generate"], function (param) {
 	config_only = true;
 	if (param !== undefined && param.trim() !== "") {
 		config_filename = param.trim();
@@ -69,36 +70,37 @@ opt.set(["-g", "--generate"], function (param) {
 	opt.consume(param);
 }, "Generate a configuration JSON expression. Optionally save it to a file.");
 
-opt.set(["-h", "--help"], function () {
+opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help document.");
-
-// Process the command line arguments
-opt.parse(process.argv);
 
 //
 // Now that everything is configured do what Fred wants.
 //
-if (config_only === true) {
-	if (config_filename === "") {
-		console.log(JSON.stringify(config));
-	} else {
-		fs.writeFile(config_filename, JSON.stringify(config),
-			function (err) {
-				if (err) {
-					console.error("ERROR: can't write", config_filename);
-					process.exit(1);
-				}
-				console.log("Wrote configuration to", config_filename);
-				process.exit(0);
-			});
-	}
-} else {
-	process.stdout.write("\nHello " + config.name);
-	if (config.show_email === true) {
-		process.stdout.write(",\n\n\tYour email address is " +
-				config.email + "\n\n");
-	} else {
-		process.stdout.write("\n\n");
-	}
-}
+opt.on("ready", function (config) {
+    // Process the command line arguments
+    opt.optionWith(process.argv);
+
+    if (config_only === true) {
+        if (config_filename === "") {
+            console.log(JSON.stringify(config));
+        } else {
+            fs.writeFile(config_filename, JSON.stringify(config), function (err) {
+                if (err) {
+                    console.error("ERROR: can't write", config_filename);
+                    process.exit(1);
+                }
+                console.log("Wrote configuration to", config_filename);
+                process.exit(0);
+            });
+        }
+    } else {
+        process.stdout.write("\nHello " + config.name);
+        if (config.show_email === true) {
+            process.stdout.write(",\n\n\tYour email address is " +
+                                 config.email + "\n\n");
+        } else {
+            process.stdout.write("\n\n");
+        }
+    }
+});

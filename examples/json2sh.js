@@ -1,5 +1,3 @@
-//
-// Example program using opt
 // json2sh.js - Convert a JSON blob into set of Bash variable assignments
 // 
 // @author: R. S. Doiel, <rsdoiel@gmail.com>
@@ -8,6 +6,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
+/*jslint node: true */
 "use strict";
 
 var fs = require("fs"),
@@ -18,7 +17,7 @@ var fs = require("fs"),
     fields = {},
     buf;
 
-opt.setup("USAGE: node " + path.basename(process.argv[1]) + " --input=JSON_FILENAME --output=BASH_FILENAME",
+opt.optionHelp("USAGE: node " + path.basename(process.argv[1]) + " --input=JSON_FILENAME --output=BASH_FILENAME",
     "SYNOPSIS: Report processsed urls in the database generate by " + path.basename(process.argv[1]) + ".\n",
     "OPTIONS:",
     " by R. S. Doiel " +
@@ -27,16 +26,16 @@ opt.setup("USAGE: node " + path.basename(process.argv[1]) + " --input=JSON_FILEN
     " See: http://opensource.org/licenses/bsd-license.php"
 	);
 
-opt.set(["-h", "--help"], function () {
+opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help page.");
-opt.set(["-i", "--input"], function (param) {
+opt.opton(["-i", "--input"], function (param) {
     input = param;
 }, "Set the name of the JSON file to read.");
-opt.set(["-o", "--output"], function (param) {
+opt.option(["-o", "--output"], function (param) {
     output = param;
 }, "Set the name of the JSON file to read.");
-opt.parse(process.argv);
+opt.optionWith(process.argv);
 
 fields = JSON.parse(fs.readFileSync(input).toString());
 buf = [

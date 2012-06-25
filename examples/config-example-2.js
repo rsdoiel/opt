@@ -1,6 +1,7 @@
 //
 // Demo a simple asynchronous configuration processing
 //
+/*jslint node: true */
 "use strict";
 
 var path = require("path"),

@@ -2,6 +2,7 @@
 // Demo a simple asynchronous configuration processing
 // using a ready event.
 //
+/*jslint node: true */
 "use strict";
 
 var path = require("path"),
@@ -23,4 +24,3 @@ opt.on("ready", function (config) {
 	// found in the search path list.
 	console.log("Processed config: ", config);
 });
-

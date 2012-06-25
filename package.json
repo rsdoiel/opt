@@ -18,9 +18,10 @@
 	}],
 	"engines" : {
 		"node" : ">= 0.7.12",
-		"npm" : ">= 1"
+		"npm" : ">= 1.1.30"
 	},
 	"dependencies" : {
+        "github-flavored-markdown": "1.0.1"
 	},
 	"scripts" : {
 		"test" : "node opt_test.js"

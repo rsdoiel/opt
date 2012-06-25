@@ -2,6 +2,7 @@
 // Show the use of consumable args and rendering a resulting
 // argv from opt.parse(process.argv).
 //
+/*jslint node: true */
 "use strict";
 
 /* Example output:

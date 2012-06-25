@@ -43,10 +43,10 @@ var option = function (options, callback, help_message) {
 		for (i = 0; i < options.length; i += 1) {
 			this.opts[options[i]] = callback;
 		}
-		this.help_messages[options.join(", ")] = help_message;
+		this.option_messages[options.join(", ")] = help_message;
 	} else {
 		this.opts[options] = callback;
-		this.help_messages[options] = help_message;
+		this.option_messages[options] = help_message;
 	}
 	return true;
 };
@@ -103,7 +103,7 @@ var optionWith = function (argv) {
 // @param sysnopsis {string} The synopsis block as text
 // @param options {string} The prefix to the options block as text.
 // @param copyright {string} The copyright or credits block as text.
-var setupHelp = function (heading, synopsis, options, copyright) {
+var optionHelp = function (heading, synopsis, options, copyright) {
 	// Now apply the options
 	this.heading = heading;
 	if (synopsis !== undefined) {
@@ -149,8 +149,8 @@ var usage = function (msg, error_level) {
 	}
 
 	console.log(headings.join("\n\n "));
-	Object.keys(self.help_messages).forEach(function (ky) {
-		console.log("\t" + ky + "\t\t" + self.help_messages[ky]);
+	Object.keys(self.option_messages).forEach(function (ky) {
+		console.log("\t" + ky + "\t\t" + self.option_messages[ky]);
 	});
 	console.log("\n\n");
 	if (msg !== undefined) {
@@ -280,17 +280,18 @@ var config = function (default_config, search_paths, callback) {
 // help - gets help_messages object.
 // @return {object} the aggregated help information.
 var help = function () {
-	return this.help_messages;
+	return this.option_messages;
 };
 
 // rest - define a restful interaction
 // @param method {string} this type of method being defined (e.g. GET, POST, DELETE, PUT)
 // @param path_expression {RegExp} a regular expression expression describing the RESTful path
-// @param args {object} the URL parameters (e.g. accepting ?json=1&callback=MyFunc would be defined as {json:"boolean", callback: "string")
-// @param event_name {string} the name of the event to pass the request and respode to.
+// @param validators {object} a object of URL parameters and fieldnames where the value is a function validating the field
+// (e.g. accepting ?json=true&callback=MyFunc&page=1 would be defined as {json: toBoolean, callback: toVarname, page: toInteger)
+// @param callback_or_event_name {string} the name of the event to pass the request and respode to.
 // @param help_message - short documentation string for RESTful help page.
-var rest = function (method, path_expression, args, event_name, help_message) {
-    var re;
+var rest = function (method, path_expression, validators, callback_or_event_name, help_message) {
+    var re, event_name = false, callback = false;
     
     if (typeof path_expression === "string") {
         re = new RegExp(path_expression);
@@ -301,11 +302,18 @@ var rest = function (method, path_expression, args, event_name, help_message) {
     if (this.restful[method] === undefined) {
         this.restful[method] = [];
     }
+    
+    if (typeof callback_or_event_name === "function") {
+        callback = callback_or_event_name;
+    } else {
+        event_name = callback_or_event_name;
+    }
     // Now add the RegExp, etc. to the method list
     this.restful[method].push({
         re: re,
-        args: args,
-        event_name: event_name
+        validators: validators,
+        event_name: event_name,
+        callback: callback
     });
 };
 
@@ -351,6 +359,21 @@ var restWith = function (request, response) {
     return re_found;
 };
 
+// restHelp - generate documentation on the API run by restWith().
+// @param target {string} either "text", "markdown" or "html". If "html" then 
+// render using github-markdown-flavor module.
+// @return {string} 
+var restHelp = function (target) {
+    switch (target) {
+    case 'html':
+        return "html Not Implemented Yet!";
+    case 'markdown':
+        return "markdown Not Implemented Yet!";
+    default:
+        return "plain text Not Implemented Yet!";
+    }
+};
+
 // A constructor to created an EventEmitter
 // version of opt. 
 // @constructor
@@ -358,8 +381,9 @@ var restWith = function (request, response) {
 var create = function () {
     var Opt = function () {
         this.opts = {};
+        this.option_messages = {};
         this.restful = {};
-        this.help_messages = {};
+        this.restful_messages = {};
         this.consumable = [];
         this.heading = false;
         this.synopsis = false;
@@ -369,18 +393,18 @@ var create = function () {
                 
         this.set = option; // set() is depreciated in favaor of option()
         this.parse = optionWith; // parse() is depreciated in favor of optionWith();
-        this.setup = setupHelp; // setup() is depcreciated in favor of setopHelp();
+        this.setup = optionHelp; // setup() is depcreciated in favor of setopHelp();
 
         this.option = option;
         this.optionWith = optionWith;
+        this.optionHelp = optionHelp;
         this.consume = consume;
-        this.help = help;
-        this.setupHelp = setupHelp;
         this.usage = usage;
         this.configSync = configSync;
         this.config = config;
         this.rest = rest;
         this.restWith = restWith;
+        this.restHelp = restHelp;
         events.EventEmitter.call(this);
     };
     util.inherits(Opt, events.EventEmitter);
@@ -390,17 +414,17 @@ var create = function () {
 
 exports.set = option; // set() is depreciated in favor of option()
 exports.parse = optionWith; // parse() is depreciated in favor of optionWith()
-exports.setup = setupHelp; // setup() is depreciated in favor of setupHelp()
+exports.setup = optionHelp; // setup() is depreciated in favor of optionHelp()
 
 
 exports.create = create;
 exports.option = option;
 exports.optionWith = optionWith;
+exports.optionHelp = optionHelp;
 exports.rest = rest;
 exports.restWith = restWith;
+exports.restHelp = restHelp;
 exports.consume = consume;
-exports.help = help;
-exports.setupHelp = setupHelp;
 exports.usage = usage;
 exports.configSync = configSync;
 exports.config = config;
