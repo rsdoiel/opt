@@ -133,7 +133,7 @@ var usage = function (msg, error_level) {
 		}
 
 		Object.keys(self.help_messages).forEach(function (ky) {
-			console.log("\t" + ky + "\t\t" + self.help_messages[ky].trim() + "\n\n");
+			console.log("\t" + ky + "\t\t" + self.help_messages[ky].trim() + "\n");
 		});
 
 		if (msg !== undefined) {
