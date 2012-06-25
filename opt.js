@@ -16,7 +16,7 @@ var fs = require("fs"),
 	util = require("util");
 
 
-// setOption = setup an option to be parsed on the command line.
+// option = setup an option to be parsed on the command line.
 // arguments are options (e.g. a string or array of command line flags like -h, 
 // --help), a callback and help string. Callback's are passed a single 
 // parameter containing the option's passed value or true if option 
@@ -119,43 +119,59 @@ var setup = function (heading, synopsis, options, copyright) {
 var usage = function (msg, error_level) {
 	var self = this, ky, headings = [];
 
-	if (self.heading) {
-		headings.push("\n " + self.heading);
-	}
-
 	if (error_level !== undefined) {
-		console.error(headings.join("\n\n "));
-		if (this.copyright) {
-			console.error(this.copyright);
+		if (self.heading) {
+			console.error("\n " + self.heading + "\n");
 		}
+	
+		if (this.synopsis) {
+			console.error("\n " + this.synopsis + "\n");
+		}
+	
+		if (this.options) {
+			console.error("\n " + this.options + "\n");
+		}
+
+		if (this.copyright) {
+			console.error("\n " + this.copyright + "\n");
+		}
+
 		if (msg !== undefined) {
-			console.error(" " + msg + "\n");
+			console.error("\n " + msg + "\n");
 		} else {
 			console.error("ERROR: process exited with an error " + error_level);
 		}
 		process.exit(error_level);
-	}
+	} else {
+		if (self.heading) {
+			console.log("\n " + self.heading + "\n");
+		}
+	
+		if (this.synopsis) {
+			console.log("\n " + this.synopsis + "\n");
+		}
+	
+		if (this.options) {
+			console.log("\n " + this.options + "\n");
+		}
 
-	if (this.synopsis) {
-		headings.push(this.synopsis);
+		if (this.copyright) {
+			console.log("\n " + this.copyright + "\n");
+		}
+		console.log(headings.join("\n\n "));
+		Object.keys(self.help_messages).forEach(function (ky) {
+			console.log("\t" + ky + "\t\t" + self.help_messages[ky]);
+		});
+		console.log("\n\n");
+		if (msg !== undefined) {
+			console.log(" " + msg + "\n");
+		}
+	
+		if (self.copyright) {
+			console.log(self.copyright);
+		}
+		process.exit(0);
 	}
-	if (this.options) {
-		headings.push(this.options);
-	}
-
-	console.log(headings.join("\n\n "));
-	Object.keys(self.help_messages).forEach(function (ky) {
-		console.log("\t" + ky + "\t\t" + self.help_messages[ky]);
-	});
-	console.log("\n\n");
-	if (msg !== undefined) {
-		console.log(" " + msg + "\n");
-	}
-
-	if (self.copyright) {
-		console.log(self.copyright);
-	}
-	process.exit(0);
 };
 
 // Given a default configuration, search the search paths
