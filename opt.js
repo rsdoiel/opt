@@ -286,12 +286,10 @@ var help = function () {
 // rest - define a restful interaction
 // @param method {string} this type of method being defined (e.g. GET, POST, DELETE, PUT)
 // @param path_expression {RegExp} a regular expression expression describing the RESTful path
-// @param validators {object} a object of URL parameters and fieldnames where the value is a function validating the field
-// (e.g. accepting ?json=true&callback=MyFunc&page=1 would be defined as {json: toBoolean, callback: toVarname, page: toInteger)
-// @param callback_or_event_name {string} the name of the event to pass the request and respode to.
+// @param callback {function} the function to respond to the http request with.
 // @param help_message - short documentation string for RESTful help page.
-var rest = function (method, path_expression, validators, callback_or_event_name, help_message) {
-    var re, event_name = false, callback = false;
+var rest = function (method, path_expression, callback, help_message) {
+    var re;
     
     if (typeof path_expression === "string") {
         re = new RegExp(path_expression);
@@ -312,7 +310,6 @@ var rest = function (method, path_expression, validators, callback_or_event_name
     this.restful[method].push({
         re: re,
         validators: validators,
-        event_name: event_name,
         callback: callback
     });
 };
@@ -334,27 +331,9 @@ var restWith = function (request, response) {
         matching = url_parts.path.match(method[i].re);
         if (matching) {
             // Process and trigger event or make callback.
-            self.emit(method[i].event_name, {
-                method: request.method,
-                rule_no: i,
-                event_name: method[i].event_name,
-                matched: matching,
-                request: request,
-                response: response
-            });
+            method[i].callback(request, response, matching, i);
             re_found = true;
         }
-    }
-
-    if (re_found === false) {
-        self.emit("error", {
-            method: request.method,
-            rule_no: -1,
-            event_name: "error",
-            matched: false,
-            request: request,
-            response: response
-        });
     }
     return re_found;
 };

@@ -105,62 +105,30 @@ opt.option(['-h', '--help'], function () {
     opt.usage();
 }, "This help document.");
 
-// Bind some RESTful requests to events.
-opt.rest("get", new RegExp("^(|\/)$"), {asMarkdown: toBoolean}, "homepage", "Show server homepage. List the Markdown files available for viewing.");
 
-opt.rest("get", new RegExp("^\/help$", "i"), {asMarkdown: toBoolean}, function (restful) {
-    restful.response.end(opt.restHelp("html"));
+// Now define event handlers for opt.
+var homepage = function (request, response, matching, rule_no) {
+    // Process the home page request
+    console.log("Rule", rule_no, "matching", matching);
+};
+
+var markdown_page = function (request, response, matching, rule_no) {
+    // Process the markdown file if it exists
+    console.log("Rule", rule_no, "matching", matching);
+};
+
+    
+// define some RESTful requests to events.
+opt.rest("get", new RegExp("^(|\/)$"), {asMarkdown: toBoolean}, homepage, "Show server homepage. List the Markdown files available for viewing.");
+
+opt.rest("get", new RegExp("^\/help$", "i"), {asMarkdown: toBoolean}, function (request, response) {
+    console.log("Help page");
+    response.end(opt.restHelp("html"));
 }, "Show help documentation for server.");
 
 // Now define a default rule (i.e. everything else)
-opt.rest("get", new RegExp("*"), {asMarkdown: toBoolean}, "markdown", "Display a markdown pageL.");
+opt.rest("get", new RegExp("*"), {asMarkdown: toBoolean}, markdown_page, "Display a markdown pageL.");
 
-// Now define event handlers for opt.
-opt.on("homepage", function (restful) {
-    // Process the home page request
-    /* restulf = 
-        {
-                method: request.method,
-                rule_no: i,
-                event_name: method[i].event_name,
-                matched: matching,
-                request: request,
-                response: response
-            }    
-    */
-});
-
-opt.on("markdown", function (restful) {
-    // Process the markdown file if it exists
-    /* restulf = 
-        {
-                method: request.method,
-                rule_no: i,
-                event_name: method[i].event_name,
-                matched: matching,
-                request: request,
-                response: response
-            }    
-    */
-});
-
-opt.on("help", function (restful) {
-    restful.response.end("Show Help page");
-});
-
-// Handle any requests without a rule.
-opt.on("error", function (restful) {
-    /* restulf = 
-        {
-                method: request.method,
-                rule_no: -1,
-                event_name: "error",
-                matched: false,
-                request: request,
-                response: response
-            }    
-    */
-});
 
 var parentProcess = function (config) {
     var child_processes = {}, i, worker, restart_process;
@@ -186,7 +154,13 @@ var parentProcess = function (config) {
     }
     // Spawn the http server
     http.createServer(function (request, response) {
-        opt.restWith(request, response);
+        if (opt.restWith(request, response)) {
+            console.log("processing", request.url);
+        } else {
+            console.error("Not found", request.url);
+            response.statusCode = 404;
+            response.end("Not Found");
+        }
     });
 };
 
