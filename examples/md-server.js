@@ -8,7 +8,6 @@
 // See: http://opensource.org/licenses/bsd-license.php
 //
 /*jslint devel: true, node: true */
-/*global fs, opt */
 
 "use strict";
 
@@ -107,9 +106,9 @@ opt.option(['-h', '--help'], function () {
 
 
 // Now define event handlers for opt.
-var homepage = function (request, response, matching, rule_no) {
+var homepage = function (request, response) {
     // Process the home page request
-    console.log("Rule", rule_no, "matching", matching);
+    console.log("Home page request");
 };
 
 var markdown_page = function (request, response, matching, rule_no) {
@@ -117,17 +116,19 @@ var markdown_page = function (request, response, matching, rule_no) {
     console.log("Rule", rule_no, "matching", matching);
 };
 
-    
-// define some RESTful requests to events.
-opt.rest("get", new RegExp("^(|\/)$"), {asMarkdown: toBoolean}, homepage, "Show server homepage. List the Markdown files available for viewing.");
-
-opt.rest("get", new RegExp("^\/help$", "i"), {asMarkdown: toBoolean}, function (request, response) {
+var help =  function (request, response) {
     console.log("Help page");
     response.end(opt.restHelp("html"));
-}, "Show help documentation for server.");
+};
+
+    
+// define some RESTful requests to events.
+opt.rest("get", new RegExp("^(|\/)$"), homepage, "Show server homepage. List the Markdown files available for viewing.");
+
+opt.rest("get", new RegExp("^/help$", "i"), help, "Show help documentation for server.");
 
 // Now define a default rule (i.e. everything else)
-opt.rest("get", new RegExp("*"), {asMarkdown: toBoolean}, markdown_page, "Display a markdown pageL.");
+opt.rest("get", new RegExp("/*"), markdown_page, "Display a markdown pageL.");
 
 
 var parentProcess = function (config) {

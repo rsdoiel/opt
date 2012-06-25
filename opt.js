@@ -288,6 +288,7 @@ var help = function () {
 // @param path_expression {RegExp} a regular expression expression describing the RESTful path
 // @param callback {function} the function to respond to the http request with.
 // @param help_message - short documentation string for RESTful help page.
+// @return {object} containing the method type and rule number in that method list.
 var rest = function (method, path_expression, callback, help_message) {
     var re;
     
@@ -312,6 +313,8 @@ var rest = function (method, path_expression, callback, help_message) {
         validators: validators,
         callback: callback
     });
+    rule_no = this.restful[method].length - 1;
+    return {method: method, rule_no: rule_no};
 };
 
 // restWith - process the request and response provided by http.server() against the rest interactions defined.
@@ -337,6 +340,9 @@ var restWith = function (request, response) {
     }
     return re_found;
 };
+    
+// unrest = Remove a RESTful rule from processing by restWith();
+// FIXME: need a method to dynamic remove rules if needed.
 
 // restHelp - generate documentation on the API run by restWith().
 // @param target {string} either "text", "markdown" or "html". If "html" then 
