@@ -117,58 +117,56 @@ var setup = function (heading, synopsis, options, copyright) {
 
 // Render opt's setup and exit with an error level
 var usage = function (msg, error_level) {
-	var self = this, ky, headings = [];
+	var self = this, ky;
 
 	if (error_level !== undefined) {
 		if (self.heading) {
-			console.error("\n " + self.heading + "\n");
+			console.error(" " + this.heading.trim() + "\n\b");
 		}
 	
 		if (this.synopsis) {
-			console.error("\n " + this.synopsis + "\n");
+			console.error(" " + this.synopsis.trim() + "\n\n");
 		}
 	
 		if (this.options) {
-			console.error("\n " + this.options + "\n");
+			console.error(" " + this.options.trim() + "\n\n");
 		}
 
 		if (this.copyright) {
-			console.error("\n " + this.copyright + "\n");
+			console.error(" " + this.copyright.trim() + "\n\n");
 		}
 
 		if (msg !== undefined) {
-			console.error("\n " + msg + "\n");
+			console.error(" " + msg + "\n\n");
 		} else {
 			console.error("ERROR: process exited with an error " + error_level);
 		}
 		process.exit(error_level);
 	} else {
 		if (self.heading) {
-			console.log("\n " + self.heading + "\n");
+			console.log(" " + this.heading.trim() + "\n");
 		}
 	
 		if (this.synopsis) {
-			console.log("\n " + this.synopsis + "\n");
+			console.log(" " + this.synopsis.trim() + "\n");
 		}
 	
 		if (this.options) {
-			console.log("\n " + this.options + "\n");
+			console.log(" " + this.options.trim() + "\n");
 		}
 
 		if (this.copyright) {
-			console.log("\n " + this.copyright + "\n");
+			console.log(" " + this.copyright.trim() + "\n");
 		}
-		console.log(headings.join("\n\n "));
-		Object.keys(self.help_messages).forEach(function (ky) {
-			console.log("\t" + ky + "\t\t" + self.help_messages[ky]);
+		Object.keys(this.help_messages).forEach(function (ky) {
+			console.log("\t" + ky + "\t\t" + self.help_messages[ky].trim() + "\n\n");
 		});
-		console.log("\n\n");
 		if (msg !== undefined) {
 			console.log(" " + msg + "\n");
 		}
 	
 		if (self.copyright) {
-			console.log(self.copyright);
+			console.log(this.copyright);
 		}
 		process.exit(0);
 	}
