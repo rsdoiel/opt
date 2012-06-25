@@ -119,7 +119,32 @@ var setup = function (heading, synopsis, options, copyright) {
 var usage = function (msg, error_level) {
 	var self = this, ky;
 
-	if (error_level !== undefined) {
+	if (error_level === undefined || error_level === 0) {
+		if (this.heading) {
+			console.log(" " + this.heading.trim() + "\n");
+		}
+	
+		if (this.synopsis) {
+			console.log(" " + this.synopsis.trim() + "\n");
+		}
+	
+		if (this.options) {
+			console.log(" " + this.options.trim() + "\n");
+		}
+
+		Object.keys(self.help_messages).forEach(function (ky) {
+			console.log("\t" + ky + "\t\t" + self.help_messages[ky].trim() + "\n\n");
+		});
+
+		if (msg !== undefined) {
+			console.log(" " + msg + "\n");
+		}
+	
+		if (this.copyright) {
+			console.log(" " + this.copyright.trim() + "\n");
+		}
+		process.exit(0);
+	} else {
 		if (self.heading) {
 			console.error(" " + this.heading.trim() + "\n\b");
 		}
@@ -132,43 +157,17 @@ var usage = function (msg, error_level) {
 			console.error(" " + this.options.trim() + "\n\n");
 		}
 
-		if (this.copyright) {
-			console.error(" " + this.copyright.trim() + "\n\n");
-		}
-
 		if (msg !== undefined) {
 			console.error(" " + msg + "\n\n");
 		} else {
 			console.error("ERROR: process exited with an error " + error_level);
 		}
-		process.exit(error_level);
-	} else {
-		if (self.heading) {
-			console.log(" " + this.heading.trim() + "\n");
-		}
-	
-		if (this.synopsis) {
-			console.log(" " + this.synopsis.trim() + "\n");
-		}
-	
-		if (this.options) {
-			console.log(" " + this.options.trim() + "\n");
-		}
 
 		if (this.copyright) {
-			console.log(" " + this.copyright.trim() + "\n");
+			console.error(" " + this.copyright.trim() + "\n\n");
 		}
-		Object.keys(this.help_messages).forEach(function (ky) {
-			console.log("\t" + ky + "\t\t" + self.help_messages[ky].trim() + "\n\n");
-		});
-		if (msg !== undefined) {
-			console.log(" " + msg + "\n");
-		}
-	
-		if (self.copyright) {
-			console.log(this.copyright);
-		}
-		process.exit(0);
+
+		process.exit(error_level);
 	}
 };
 
@@ -275,13 +274,6 @@ var config = function (default_config, search_paths, callback) {
 	scanPaths(search_paths, callback);
 };
 
-
-// Return the aggregated help information.
-var help = function () {
-	return this.help_messages;
-};
-
-
 // A constructor to created an EventEmitter
 // version of opt. 
 var create = function () {
@@ -298,7 +290,6 @@ var create = function () {
         this.set = set;
         this.consume = consume;
         this.parse = parse;
-        this.help = help;
         this.setup = setup;
         this.usage = usage;
         this.configSync = configSync;
@@ -314,7 +305,6 @@ exports.create = create;
 exports.set = set;
 exports.consume = consume;
 exports.parse = parse;
-exports.help = help;
 exports.setup = setup;
 exports.usage = usage;
 exports.configSync = configSync;
