@@ -15,10 +15,11 @@ var util = require("util"),
 
 opt.optionHelp("USAGE node example-1.js.",
 	"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node example-1.js --help",
-	"OPTIONS",
+	"OPTIONS:",
 	" copyright (c) 2012 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
 	" See: http://opensource.org/licenses/bsd-license.php\n");
+
 opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help document.");

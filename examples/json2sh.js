@@ -20,16 +20,16 @@ var fs = require("fs"),
 opt.optionHelp("USAGE: node " + path.basename(process.argv[1]) + " --input=JSON_FILENAME --output=BASH_FILENAME",
     "SYNOPSIS: Report processsed urls in the database generate by " + path.basename(process.argv[1]) + ".\n",
     "OPTIONS:",
-    " by R. S. Doiel " +
-    " copyright (c) 2012 all rights reserved " +
-    " Released under New the BSD License. " +
+    " by R. S. Doiel\n" +
+    " copyright (c) 2012 all rights reserved\n" +
+    " Released under New the BSD License.\n" +
     " See: http://opensource.org/licenses/bsd-license.php"
 	);
 
 opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help page.");
-opt.opton(["-i", "--input"], function (param) {
+opt.option(["-i", "--input"], function (param) {
     input = param;
 }, "Set the name of the JSON file to read.");
 opt.option(["-o", "--output"], function (param) {

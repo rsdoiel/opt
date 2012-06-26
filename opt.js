@@ -6,7 +6,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.8
+// revision: 0.0.9
 //
 
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
@@ -50,6 +50,7 @@ var option = function (options, callback, help_message) {
 	}
 	return true;
 };
+
 
 // consume - removing an argument from the processed argument returned
 // by opt.parse().
@@ -98,6 +99,7 @@ var optionWith = function (argv) {
 	return true;
 };
 
+
 // setup how opt with build the basic command line text description.
 // @param heading {string} The heading block as text
 // @param sysnopsis {string} The synopsis block as text
@@ -118,53 +120,75 @@ var optionHelp = function (heading, synopsis, options, copyright) {
 	return true;
 };
 
+
 // Render opt's usage text and exit with an error level
 // @param msg {string} optional message to include in the usage text rendered
 // @param error_level {number} an integer, 0 is no error, greater then zero is an OS level error level.
 var usage = function (msg, error_level) {
-	var self = this, ky, headings = [];
+	var self = this, ky;
 
-	if (self.heading) {
-		headings.push("\n " + self.heading);
-	}
-
-	if (error_level !== undefined) {
-		console.error(headings.join("\n\n "));
-		if (this.copyright) {
-			console.error(this.copyright);
+	if (error_level === undefined || error_level === 0) {
+		if (this.heading) {
+			console.log(" " + this.heading.trim() + "\n");
 		}
+	
+		if (this.synopsis) {
+			console.log(" " + this.synopsis.trim() + "\n");
+		}
+	
+		if (this.options) {
+			console.log(" " + this.options.trim() + "\n");
+		}
+
+		Object.keys(this.option_messages).forEach(function (ky) {
+			console.log("\t" + ky + "\t\t" + self.option_messages[ky].trim() + "\n");
+		});
+
+		if (msg !== undefined) {
+			console.log(" " + msg + "\n");
+		}
+	
+		if (this.copyright) {
+			console.log(" " + this.copyright.trim() + "\n");
+		}
+		process.exit(0);
+	} else {
+		if (this.heading) {
+			console.error(" " + this.heading.trim() + "\n");
+		}
+	
+		if (this.synopsis) {
+			console.error(" " + this.synopsis.trim() + "\n");
+		}
+	
+		if (this.options) {
+			console.error(" " + this.options.trim() + "\n");
+		}
+
 		if (msg !== undefined) {
 			console.error(" " + msg + "\n");
 		} else {
 			console.error("ERROR: process exited with an error " + error_level);
 		}
+
+		Object.keys(self.option_messages).forEach(function (ky) {
+			console.log("\t" + ky + "\t\t" + self.option_messages[ky]);
+		});
+		console.log("\n");
+		if (msg !== undefined) {
+			console.log(" " + msg + "\n");
+		}
+		if (this.copyright) {
+			console.error(" " + this.copyright.trim() + "\n");
+		}
 		process.exit(error_level);
 	}
-
-	if (this.synopsis) {
-		headings.push(this.synopsis);
+	if (error_level === undefined) {
+		error_level = 0;
 	}
-	if (this.options) {
-		headings.push(this.options);
-	}
-
-	console.log(headings.join("\n\n "));
-	Object.keys(self.option_messages).forEach(function (ky) {
-		console.log("\t" + ky + "\t\t" + self.option_messages[ky]);
-	});
-	console.log("\n\n");
-	if (msg !== undefined) {
-		console.log(" " + msg + "\n");
-	}
-
-	if (self.copyright) {
-		console.log(self.copyright);
-	}
-    if (error_level === undefined) {
-        error_level = 0;
-    }
 	process.exit(error_level);
 };
+
 
 // Given a default configuration, search the search paths
 // for JSON file on disc with custom configuration.
@@ -209,6 +233,7 @@ var configSync = function (default_config, search_paths) {
 
 	return custom_config;
 };
+
 
 // Given a default configuration, search the search paths
 // for JSON file on disc with custom configuration.
@@ -277,20 +302,14 @@ var config = function (default_config, search_paths, callback) {
 };
 
 
-// help - gets help_messages object.
-// @return {object} the aggregated help information.
-var help = function () {
-	return this.option_messages;
-};
-
 // rest - define a restful interaction
 // @param method {string} this type of method being defined (e.g. GET, POST, DELETE, PUT)
 // @param path_expression {RegExp} a regular expression expression describing the RESTful path
-// @param callback {function} the function to respond to the http request with.
+// @param callback_or_event_name {function|string} the function to respond to the http request with.
 // @param help_message - short documentation string for RESTful help page.
 // @return {object} containing the method type and rule number in that method list.
-var rest = function (method, path_expression, callback, help_message) {
-    var re;
+var rest = function (method, path_expression, callback_or_event_name, help_message) {
+    var re, callback, event_name, rule_no;
     
     if (typeof path_expression === "string") {
         re = new RegExp(path_expression);
@@ -310,8 +329,8 @@ var rest = function (method, path_expression, callback, help_message) {
     // Now add the RegExp, etc. to the method list
     this.restful[method].push({
         re: re,
-        validators: validators,
-        callback: callback
+        callback: callback,
+        event_name: event_name
     });
     rule_no = this.restful[method].length - 1;
     return {method: method, rule_no: rule_no};
@@ -375,32 +394,29 @@ var create = function () {
         this.options = false;
         this.copyright = false;
         this.consumable = [];
-                
-        this.set = option; // set() is depreciated in favaor of option()
-        this.parse = optionWith; // parse() is depreciated in favor of optionWith();
-        this.setup = optionHelp; // setup() is depcreciated in favor of setopHelp();
 
         this.option = option;
         this.optionWith = optionWith;
         this.optionHelp = optionHelp;
         this.consume = consume;
+
         this.usage = usage;
         this.configSync = configSync;
         this.config = config;
         this.rest = rest;
         this.restWith = restWith;
         this.restHelp = restHelp;
+                        
+        this.set = option; // set() is depreciated in favaor of option()
+        this.parse = optionWith; // parse() is depreciated in favor of optionWith();
+        this.setup = optionHelp; // setup() is depcreciated in favor of setopHelp();
+
         events.EventEmitter.call(this);
     };
     util.inherits(Opt, events.EventEmitter);
     
 	return new Opt();
 };
-
-exports.set = option; // set() is depreciated in favor of option()
-exports.parse = optionWith; // parse() is depreciated in favor of optionWith()
-exports.setup = optionHelp; // setup() is depreciated in favor of optionHelp()
-
 
 exports.create = create;
 exports.option = option;
@@ -410,6 +426,11 @@ exports.rest = rest;
 exports.restWith = restWith;
 exports.restHelp = restHelp;
 exports.consume = consume;
+
 exports.usage = usage;
 exports.configSync = configSync;
 exports.config = config;
+
+exports.set = option; // set() is depreciated in favor of option()
+exports.parse = optionWith; // parse() is depreciated in favor of optionWith()
+exports.setup = optionHelp; // setup() is depreciated in favor of optionHelp()

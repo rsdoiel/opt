@@ -16,7 +16,7 @@ var util = require("util"),
 
 opt.setup("USAGE:  node " + path.basename(process.argv[1]) + " --help",
 	"SYNOPSIS: demo a realistic example of using opt.\n\n\t\tnode " + path.basename(process.argv[1]) + "  --first-name=john \\ \n\t\t\t --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\"",
-	"OPTIONS",
+	"OPTIONS:",
 	" copyright (c) 2011 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
 	" See: http://opensource.org/licenses/bsd-license.php\n");

@@ -126,7 +126,7 @@ doTest("Consumables", function (test_name) {
         test_database_name = false;
 
     // Test consumable args and returning an argv array from parse.
-    assert.ok(opt.setupHelp("This is a test"), "Run setup to clear previous opt use.");
+    assert.ok(opt.optionHelp("This is a test"), "Run setup to clear previous opt use.");
     assert.ok(opt.option(["-d", "--database"], function (param) {
         test_database_name = param;
         opt.consume(param);
@@ -136,9 +136,8 @@ doTest("Consumables", function (test_name) {
     assert.equal(test_result[1], "my_rpt", "Should find my_rpt as test_result[1]." + util.inspect(test_result));
     assert.equal(test_database_name, "mydb", "Should find mydb as test_database_name.");
 
-
     test_consumable = ["node", "load-data.js", "--database=mydb", "--collection=mycol", "some-data.txt"];
-    opt.setupHelp("This is second test.");
+    opt.optionHelp("This is second test.");
     opt.option(["-d", "--database"], function (param) {
         opt.consume(param);
     }, "Set DB name.");
@@ -152,7 +151,7 @@ doTest("Consumables", function (test_name) {
 
     // node myproj.js some-data.txt -d mydb -c mycol
     test_consumable = ["node", "load-data.js", "some-data.txt", "-d", "mydb", "-c", "mycol"];
-    opt.setupHelp("This is the third test.");
+    opt.optionHelp("This is the third test.");
     opt.option(["-d", "--database"], function (param) {
         opt.consume(param);
     }, "Set DB name.");
