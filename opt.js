@@ -39,14 +39,14 @@ var option = function (options, callback, help_message) {
         help_message = "Option is not documented";
     }
 
-	if (typeof options !== "string") {
+	if (typeof options === "object" && options.length) {
 		for (i = 0; i < options.length; i += 1) {
 			this.opts[options[i]] = callback;
 		}
 		this.option_messages[options.join(", ")] = help_message;
 	} else {
-		this.opts[options] = callback;
-		this.option_messages[options] = help_message;
+        console.error("No options defined. Must be an array.");
+        return false;
 	}
 	return true;
 };
@@ -68,7 +68,6 @@ var optionWith = function (argv) {
 	if (argv === undefined) {
 		argv = process.argv;
 	}
-
 	// loop through command line and process args with callbacks.
 	for (i = 0; i < argv.length; i += 1) {
 		parts = argv[i].split("=");
@@ -80,7 +79,7 @@ var optionWith = function (argv) {
 				} else {
 					this.opts[parts[0]](parts[1]);
 				}
-			} else if ((i + 1) < argv.length && this.opts[argv[i + 1]] === undefined) {
+			} else if ((i + 1) < argv.length && argv[i + 1] !== undefined) {
 				this.opts[parts[0]](argv[i + 1]);
 			} else {
 				this.opts[parts[0]]();
@@ -102,7 +101,7 @@ var optionWith = function (argv) {
 
 // setup how opt with build the basic command line text description.
 // @param heading {string} The heading block as text
-// @param sysnopsis {string} The synopsis block as text
+// @param synopsis {string} The synopsis block as text
 // @param options {string} The prefix to the options block as text.
 // @param copyright {string} The copyright or credits block as text.
 var optionHelp = function (heading, synopsis, options, copyright) {
@@ -151,7 +150,6 @@ var usage = function (msg, error_level) {
 		if (this.copyright) {
 			console.log(" " + this.copyright.trim() + "\n");
 		}
-		process.exit(0);
 	} else {
 		if (this.heading) {
 			console.error(" " + this.heading.trim() + "\n");
@@ -172,21 +170,20 @@ var usage = function (msg, error_level) {
 		}
 
 		Object.keys(self.option_messages).forEach(function (ky) {
-			console.log("\t" + ky + "\t\t" + self.option_messages[ky]);
+			console.error("\t" + ky + "\t\t" + self.option_messages[ky]);
 		});
 		console.log("\n");
 		if (msg !== undefined) {
-			console.log(" " + msg + "\n");
+			console.error(" " + msg + "\n");
 		}
 		if (this.copyright) {
 			console.error(" " + this.copyright.trim() + "\n");
 		}
-		process.exit(error_level);
 	}
 	if (error_level === undefined) {
 		error_level = 0;
 	}
-	process.exit(error_level);
+    process.exit(error_level);
 };
 
 
@@ -312,7 +309,11 @@ var rest = function (method, path_expression, callback_or_event_name, help_messa
     var re, callback, event_name, rule_no;
     
     if (typeof path_expression === "string") {
-        re = new RegExp(path_expression);
+        try {
+            re = new RegExp(path_expression);
+        } catch (err) {
+            console.error(path_expression, err);
+        }
     } else {
         re = path_expression;
     }
@@ -348,7 +349,7 @@ var restWith = function (request, response) {
         method = {};
     }
 
-    // Check if path exppression has been defined for that
+    // Check if path expression has been defined for that
     for (i = 0; i < method.length && re_found === false; i += 1) {
         matching = url_parts.path.match(method[i].re);
         if (matching) {
@@ -357,6 +358,8 @@ var restWith = function (request, response) {
             re_found = true;
         }
     }
+    response.writeHead(404, "text/plain");
+    response.end("File not found.");
     return re_found;
 };
     
@@ -366,7 +369,7 @@ var restWith = function (request, response) {
 // restHelp - generate documentation on the API run by restWith().
 // @param target {string} either "text", "markdown" or "html". If "html" then 
 // render using github-markdown-flavor module.
-// @return {string} 
+// @return {string}
 var restHelp = function (target) {
     switch (target) {
     case 'html':
