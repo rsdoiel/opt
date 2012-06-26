@@ -42,7 +42,7 @@ This is the synchronous version.
 var path = require("path"),
 	opt = require("../opt").create();
 
-var config = { name: "fred", "email": "fred@example.com" },
+var config = { name: "fred", email: "fred@example.com" },
 	search_paths = [ "config-example-1.conf",
 			path.join(process.env.HOME, ".config-examplerc"),
 			"/usr/local/etc/config-example.conf",
@@ -71,7 +71,7 @@ Display a help message with -h and --help on the command line.
 var path = require("path"),
 	opt = require("../opt").create();
 
-var config = { name: "fred", "email": "fred@example.com" },
+var config = { name: "fred", email: "fred@example.com" },
 	search_paths = [ "config-example-1.conf",
 			path.join(process.env.HOME, ".config-examplerc"),
 			"/usr/local/etc/config-example.conf",
@@ -136,7 +136,7 @@ var http = require('http'),
     path = require("path"),
     opt = require("../opt").create();
 
-var config = { name: "fred", "email": "fred@example.com" },
+var config = { name: "fred", email: "fred@example.com" },
 	search_paths = [ "config-example-1.conf",
 			path.join(process.env.HOME, ".config-examplerc"),
 			"/usr/local/etc/config-example.conf",
