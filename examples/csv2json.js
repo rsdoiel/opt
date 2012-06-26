@@ -12,7 +12,7 @@
 
 var fs = require("fs"),
     path = require("path"),
-    opt = require("opt").create();
+    opt = require("../opt").create();
 
 var csv_filename = false,
     json_filename = false,

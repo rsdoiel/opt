@@ -44,7 +44,7 @@ Collection name: two-collection
 
 var util = require("util"),
 	path = require("path"),
-	opt = require("opt").create(),
+	opt = require("../opt").create(),
 	input_name = false,
 	output_name = false,
 	database_name = false,

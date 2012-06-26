@@ -16,7 +16,7 @@ var fs = require("fs"),
     cluster = require("cluster"),
     os = require("os"),
     http = require("http"),
-    opt = require("opt").create(),
+    opt = require("../opt").create(),
     config = {
         port: 80,
         host: "localhost",

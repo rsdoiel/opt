@@ -11,7 +11,7 @@
 "use strict";
 
 var util = require("util"),
-	opt = require("opt").create();
+	opt = require("../opt").create();
 
 opt.optionHelp("USAGE node example-1.js.",
 	"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node example-1.js --help",
