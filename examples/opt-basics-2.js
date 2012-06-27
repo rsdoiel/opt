@@ -39,17 +39,22 @@ opt.on("ready", function (config) {
     });
 
     // Define you restful service
-    var helloworld = function (req, res, matching, rule_no) {
+    opt.on("helloworld", function (data) {
+    	var req = data.request, res = data.response,
+            matching = data.matching, rule_no = data.rule_no;
+	    
         res.writeHead(200, {"content-type": "text/plain"});
         res.end("Hello " + config.name + ".\nThis is what I found: " + util.inspect(matching) + "\nRule No.:" + rule_no);
-    };
-    opt.rest("get", new RegExp("^$|^/$|^/index.html|^/helloworld.html"), helloworld);
+    });
 
-    var status404 = function (req, res) {
+    opt.on("status404", function (data) {
+    	var res = data.response, req = data.request;
         res.writeHead(404, {"content-type": "text/plain"});
         res.end("File not found. " + req.url);
-    };
-    opt.rest("get", new RegExp("^/*"), status404);
+    });
+
+    opt.rest("get", new RegExp("^$|^/$|^/index.html|^/helloworld.html"), "helloworld");
+    opt.rest("get", new RegExp("^/*"), "status404");
 
     // Process your command line args.
     opt.optionWith(process.argv);

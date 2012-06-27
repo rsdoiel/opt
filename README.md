@@ -171,7 +171,7 @@ opt.on("ready", function (config) {
 
     var status404 = function (req, res) {
         res.writeHead(404, {"content-type": "text/plain"});
-        res.end("File not found. " + request.url);
+        res.end("File not found. " + req.url);
     };
     opt.rest("get", new RegExp("^/*"), status404);
 

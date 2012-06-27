@@ -306,7 +306,7 @@ var config = function (default_config, search_paths, callback) {
 // @param help_message - short documentation string for RESTful help page.
 // @return {object} containing the method type and rule number in that method list.
 var rest = function (method, path_expression, callback_or_event_name, help_message) {
-    var re, callback, event_name, rule_no;
+    var re, callback = false, event_name = false, rule_no;
     
     if (typeof path_expression === "string") {
         try {
@@ -354,7 +354,11 @@ var restWith = function (request, response) {
         matching = request.url.match(method[i].re);
         if (matching !== null) {
             // Process and trigger event or make callback.
-            method[i].callback(request, response, matching, i);
+	    if (method[i].callback !== false) {
+                method[i].callback(request, response, matching, i);
+	    } else if (method[i].event_name !== false) {
+	    	this.emit(method[i].event_name, {request: request, response: response, matching: matching, rule_no: i});
+	    }
             re_found = true;
         }
     }
