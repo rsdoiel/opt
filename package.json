@@ -1,7 +1,7 @@
 {
 	"name" : "opt",
 	"version" : "0.0.9",
-	"description" : "A configuration, cmd line options and RESTful web processor module for NodeJS command line utilities.",
+	"description" : "A configuration, cmd line options and RESTful web processor module for NodeJS.",
 	"main" : "./opt.js",
 	"repository" : {
 		"type" : "git", 
