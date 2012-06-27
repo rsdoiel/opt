@@ -1,5 +1,3 @@
-//
-// Example program using opt
 // csv2json.js - Convert a CSV file into JSON blob file suitable for 
 // importing into MongoDB or Dirty DB.
 // 
@@ -9,17 +7,18 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
+/*jslint node: true */
 "use strict";
 
 var fs = require("fs"),
     path = require("path"),
-    opt = require("./opt").create();
+    opt = require("../opt").create();
 
 var csv_filename = false,
     json_filename = false,
     args = [];
 
-opt.setup("USAGE: node " + path.basename(process.argv[1]) + " [options] CSVFILE JSONFILE",
+opt.optionHelp("USAGE: node " + path.basename(process.argv[1]) + " [options] CSVFILE JSONFILE",
         "SYNOPSIS: Read a CSV file, generate a stream of JSON blobs suitable\n" +
         " into for dirty db or MongoDB.",
         "OPTIONS:",
@@ -29,20 +28,20 @@ opt.setup("USAGE: node " + path.basename(process.argv[1]) + " [options] CSVFILE 
         " See: http://opensource.org/licenses/bsd-license.php"
     );
 
-opt.set(["-i", "--input", "--csv"], function (param) {
+opt.option(["-i", "--input", "--csv"], function (param) {
     csv_filename = param;
     opt.consume(param);
 }, "Set the name of the CSV file to read in. If name is - then read from standard input.");
 
-opt.set(["-o", "--output", "--json"], function (param) {
+opt.option(["-o", "--output", "--json"], function (param) {
     json_filename = param;
     opt.consume(param);
 }, "Set the of the JSON blob file to output. If name is - then write to standard output.");
-opt.set(["-h", "--help"], function () {
+opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help page.");
 
-args = opt.parse(process.argv);
+args = opt.optionWith(process.argv);
 
 if (args === true &&
 	    csv_filename === false &&

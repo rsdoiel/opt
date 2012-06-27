@@ -9,7 +9,8 @@
 //
 // revision: 0.0.7
 //
-//"use strict";
+
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var fs = require("fs"),
     util = require("util"),
@@ -92,8 +93,8 @@ console.log("Starting (opt_test.js) ... " + new Date());
 
 doTest("opt creation", function (test_name) {
     var opt = OPT.create();
-    assert.equal(typeof opt.set, "function", "Should see an exported set()");
-    assert.equal(typeof opt.parse, "function", "Should see an exported parse()");
+    assert.equal(typeof opt.option, "function", "Should see an exported set()");
+    assert.equal(typeof opt.optionWith, "function", "Should see an exported parse()");
     completedTest(test_name);
 });
 
@@ -107,11 +108,11 @@ doTest("param processing and help()", function (test_name) {
         }
     };
 
-    assert.ok(opt.set(["-h", "--help"], help, "Show the help document."), "set() should return true.");
+    assert.ok(opt.option(["-h", "--help"], help, "Show the help document."), "set() should return true.");
     for (i = 0; i < test_args.length; i += 1) {
         test_no = i;
         help_has_args = false;
-        assert.ok(opt.parse(test_args[i].args), "Should return true on successful parse(). for args: " + JSON.stringify(test_args[i]));
+        assert.ok(opt.optionWith(test_args[i].args), "Should return true on successful parse(). for args: " + JSON.stringify(test_args[i]));
         assert.equal(help_has_args, test_args[i].help_has_args, "Should have updated help_has_args to " + test_args[i].help_has_args.toString() + " for args: " + JSON.stringify(test_args[i]));
     }
     completedTest(test_name);
@@ -125,40 +126,39 @@ doTest("Consumables", function (test_name) {
         test_database_name = false;
 
     // Test consumable args and returning an argv array from parse.
-    assert.ok(opt.setup("This is a test"), "Run setup to clear previous opt use.");
-    assert.ok(opt.set(["-d", "--database"], function (param) {
+    assert.ok(opt.optionHelp("This is a test"), "Run setup to clear previous opt use.");
+    assert.ok(opt.option(["-d", "--database"], function (param) {
         test_database_name = param;
         opt.consume(param);
     }, "Should set the database name."), "Should set the database name and consume the arg");
-    test_result = opt.parse(test_consumable);
+    test_result = opt.optionWith(test_consumable);
     assert.equal(test_result[0], "testme", "Should find testme as test_result[0].");
     assert.equal(test_result[1], "my_rpt", "Should find my_rpt as test_result[1]." + util.inspect(test_result));
     assert.equal(test_database_name, "mydb", "Should find mydb as test_database_name.");
 
-
     test_consumable = ["node", "load-data.js", "--database=mydb", "--collection=mycol", "some-data.txt"];
-    opt.setup("This is second test.");
-    opt.set(["-d", "--database"], function (param) {
+    opt.optionHelp("This is second test.");
+    opt.option(["-d", "--database"], function (param) {
         opt.consume(param);
     }, "Set DB name.");
-    opt.set(["-c", "--collection"], function (param) {
+    opt.option(["-c", "--collection"], function (param) {
         opt.consume(param);
     }, "Set Collection name.");
-    test_result = opt.parse(test_consumable);
+    test_result = opt.optionWith(test_consumable);
     assert.equal(test_result[0], "node", "Should have node as test_result[0]");
     assert.equal(test_result[1], "load-data.js", "Should have load-data.js as test_result[1]" + util.inspect(test_result));
     assert.equal(test_result[2], "some-data.txt", "Should have some-data.txt as test_result[2]");
 
     // node myproj.js some-data.txt -d mydb -c mycol
     test_consumable = ["node", "load-data.js", "some-data.txt", "-d", "mydb", "-c", "mycol"];
-    opt.setup("This is the third test.");
-    opt.set(["-d", "--database"], function (param) {
+    opt.optionHelp("This is the third test.");
+    opt.option(["-d", "--database"], function (param) {
         opt.consume(param);
     }, "Set DB name.");
-    opt.set(["-c", "--collection"], function (param) {
+    opt.option(["-c", "--collection"], function (param) {
         opt.consume(param);
     }, "Set Collection name.");
-    test_result = opt.parse(test_consumable);
+    test_result = opt.optionWith(test_consumable);
     assert.equal(test_result[0], "node", "Should have node as test_result[0]");
     assert.equal(test_result[1], "load-data.js", "Should have load-data.js as test_result[1]" + util.inspect(test_result));
     assert.equal(test_result[2], "some-data.txt", "Should have some-data.txt as test_result[2]");
@@ -283,7 +283,7 @@ doTest("Testing config()", function (test_name) {
 doTest("configEvents", function (test_name) {
     var opt = OPT.create();
 
-    opt.config({}, ["config-example-1.conf"]);
+    opt.config({}, ["examples/config-example-1.conf"]);
     opt.on("ready", function (args) {
         assert.equal(args.greetings, "Hello", "Should have a args.greetings of hello" + util.inspect(args));
         completedTest(test_name);

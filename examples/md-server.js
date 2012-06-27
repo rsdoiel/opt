@@ -1,23 +1,22 @@
 //
-// cluster-example.js - demo of using opt module for configuration when
-// using the cluster module.
+// md-server.js - demo of using opt module to create a RESTful markdown web page server
+// 
+// @author: R. S. Doiel, <rsdoiel@gmail.com>
+// copyright (c) 2012 all rights reserved
 //
-"use strict";
-
+// Released under New the BSD License.
+// See: http://opensource.org/licenses/bsd-license.php
+//
 /*jslint devel: true, node: true */
-/*global fs, opt */
-/*properties
-    argv, basename, configSync, consume, cpus, create, error, exit, extname,
-    fork, host, isMaster, join, length, log, numChildren, on, parse, pid, port,
-    process, readFileSync, set, setup, stringify, toFixed, toString, trim,
-    usage, readFileSync, writeFileSync, configSync
-*/
+
+"use strict";
 
 var fs = require("fs"),
     path = require("path"),
     cluster = require("cluster"),
     os = require("os"),
-    opt = require("./opt").create(),
+    http = require("http"),
+    opt = require("../opt").create(),
     config = {
         port: 80,
         host: "localhost",
@@ -26,19 +25,36 @@ var fs = require("fs"),
     config_name = path.basename(process.argv[1],
             path.extname(process.argv[1])) + ".conf";
 
-config = opt.configSync(config, [
+var toBoolean = function (value) {
+    if (typeof value === "string") {
+        value = value.toLowerCase();
+    }
+    switch (value) {
+    case "true":
+    case "1":
+    case true:
+    case "false":
+    case "0":
+    case false:
+        return true;
+    default:
+        return false;
+    }
+};
+
+opt.config(config, [
     config_name,
     path.join("/usr", "local", "etc", config_name),
     path.join("/usr", "etc", config_name),
     path.join("/etc", config_name)
 ]);
 
-opt.setup("USAGE node " + path.basename(process.argv[1]),
+opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
     "SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n " +
     "OPTIONS",
     "Copyright notice would go here.");
 
-opt.set(["-t", "--threads"], function (param) {
+opt.option(["-t", "--threads"], function (param) {
     if (Number(param).toFixed(0) > 2) {
         config.numChildren = Number(param).toFixed(0);
     } else {
@@ -46,14 +62,14 @@ opt.set(["-t", "--threads"], function (param) {
     }
 }, "Set the number of service threads to run.");
 
-opt.set(["-H", "--host"], function (param) {
+opt.option(["-H", "--host"], function (param) {
     if (param.trim()) {
         config.host = param.trim();
         opt.consume(param);
     }
 }, "Set the hostname to listen for.");
 
-opt.set(["-p", "--port"], function (param) {
+opt.option(["-p", "--port"], function (param) {
     if (Number(param).toFixed(0) > 0) {
         config.port = Number(param).toFixed(0);
         opt.consume(param);
@@ -62,13 +78,19 @@ opt.set(["-p", "--port"], function (param) {
     }
 }, "Set the port to listen on.");
 
-opt.set(["-c", "--config"], function (param) {
+opt.option(["-c", "--config"], function (param) {
     if (param.trim()) {
         config = JSON.parse(fs.readFileSync(param).toString());
     }
 }, "Set the JSON configuration file to use.");
 
-opt.set(["-g", "--generate"], function (param) {
+opt.option(["-d", "--documents"], function (param) {
+    if (param.trim()) {
+        config.docs = param.trim();
+    }
+}, "Set the document root to server the Markdown files from.");
+
+opt.option(["-g", "--generate"], function (param) {
     if (param !== undefined && param.trim()) {
         fs.writeFileSync(param, JSON.stringify(config));
     } else {
@@ -78,11 +100,35 @@ opt.set(["-g", "--generate"], function (param) {
     process.exit(0);
 }, "Generate a configuration file from current command line options. This should be the last option specified.");
 
-opt.set(['-h', '--help'], function () {
+opt.option(['-h', '--help'], function () {
     opt.usage();
 }, "This help document.");
 
-opt.parse(process.argv);
+
+// Now define event handlers for opt.
+var homepage = function (request, response) {
+    // Process the home page request
+    console.log("Home page request");
+};
+
+var markdown_page = function (request, response, matching, rule_no) {
+    // Process the markdown file if it exists
+    console.log("Rule", rule_no, "matching", matching);
+};
+
+var help =  function (request, response) {
+    console.log("Help page");
+    response.end(opt.restHelp("html"));
+};
+
+    
+// define some RESTful requests to events.
+opt.rest("get", new RegExp("^(|\/)$"), homepage, "Show server homepage. List the Markdown files available for viewing.");
+
+opt.rest("get", new RegExp("^/help$", "i"), help, "Show help documentation for server.");
+
+// Now define a default rule (i.e. everything else)
+opt.rest("get", new RegExp("/*"), markdown_page, "Display a markdown pageL.");
 
 
 var parentProcess = function (config) {
@@ -107,6 +153,16 @@ var parentProcess = function (config) {
         child_processes[worker.pid].on("death", restart_process);
         console.log("PARENT pid:", worker.pid);
     }
+    // Spawn the http server
+    http.createServer(function (request, response) {
+        if (opt.restWith(request, response)) {
+            console.log("processing", request.url);
+        } else {
+            console.error("Not found", request.url);
+            response.statusCode = 404;
+            response.end("Not Found");
+        }
+    });
 };
 
 
@@ -115,13 +171,17 @@ var childProcess = function (config) {
     process.on("message", function (msg) {
         console.log("CHILD:", msg);
     });
+    // Process the http requests, server markdown files or 404.
 };
 
 //
 // Main
-// 
-if (cluster.isMaster === true) {
-    parentProcess(config);
-} else {
-    childProcess(config);
-}
+//
+opt.on("ready", function (config) {
+    opt.optionWith(process.argv);
+    if (cluster.isMaster === true) {
+        parentProcess(config);
+    } else {
+        childProcess(config);
+    }
+});

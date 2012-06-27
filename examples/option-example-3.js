@@ -2,9 +2,11 @@
 // Show the use of consumable args and rendering a resulting
 // argv from opt.parse(process.argv).
 //
+/*jslint node: true */
 "use strict";
 
 /* Example output:
+
 example.com:  node example-3.js one two
 New args: [ 'node', 'one', 'two' ]
 Input name: one
@@ -39,11 +41,11 @@ Input name: one
 Output name: two
 Database name: one-db
 Collection name: two-collection
- */
+*/
 
 var util = require("util"),
 	path = require("path"),
-	opt = require("./opt").create(),
+	opt = require("../opt").create(),
 	input_name = false,
 	output_name = false,
 	database_name = false,

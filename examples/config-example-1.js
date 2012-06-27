@@ -1,8 +1,10 @@
 //
 // Demo a simple configuration processing
 //
+/*jslint node:true */
+
 var path = require("path"),
-	opt = require("./opt").create();
+	opt = require("../opt").create();
 
 var config = { name: "fred", "email": "fred@example.com" },
 	search_paths = [ "config-example-1.conf",
