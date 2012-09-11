@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/rsdoiel/opt.png)](http://travis-ci.org/rsdoiel/opt)
 opt
 ===
 revision 0.0.9
