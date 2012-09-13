@@ -3,9 +3,20 @@ opt
 revision 0.0.9
 --------------
 
+### Why another command line argument processor?
+
+There are three reasons I created opt.js
+
+* I wanted to simplify the boilerplate I used with JSON based configuration files including handling a set of search paths (e.g. look sequentially in
+* I wanted a very simple command line option parser that included automatically generating a help page (I'm forgetful about updating docs outside of 
+* I wanted a simple http route process that generate docs like I used for the command line
+
+That was my itch.  There are many file example of options parsing libraries in Node but they didn't quite scratch the itch I had.
+
+
 # Overview
 
-opt is a toolkit for building either command line programs or RESTful
+opt is a toolkit for building either command line programs and RESTful
 web services. It uses a common pattern for setting up and processing
 JSON based configuration files, command line options and RESTful API
 calls.
