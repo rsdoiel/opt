@@ -13,9 +13,11 @@
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var fs = require("fs"),
+    path = require("path"),
     util = require("util"),
     assert = require("assert"),
-    OPT = require("./opt");
+    harness = require("../lib/harness"),
+    OPT = require("../opt");
 
 var help_has_args = false,
     test_args = [
@@ -31,75 +33,12 @@ var help_has_args = false,
     package_json = fs.readFileSync("package.json").toString(),
     package_obj = JSON.parse(package_json);
 
-var doTest = function (test_name, func, time_for_test) {
-    var self = this;
 
-    if (self.Tests === undefined) {
-        console.log("Creating Tests = {}");
-        self.Tests = {};
-    }
-    if (self.TestsTimeout === undefined) {
-        self.TestsTimeout = 0;
-    }
-    if (time_for_test === undefined) {
-        time_for_test = 0;
-    }
+harness.push({callback: function () {
+    var opt = OPT.create(), i, help;
 
-    self.TestsTimeout = self.TestsTimeout + time_for_test;
-    self.Tests[test_name] = func;
-    console.log("Starting", test_name);
-    func(test_name);
-};
-
-var completedTest = function (test_name) {
-    var self = this;
-
-    if (self.Tests === undefined) {
-        throw ("self.Tests does not exist.");
-    }
-    console.log("Completed:", test_name);
-    delete self.Tests[test_name];
-};
-
-var monitorTests = function () {
-    var self = this, test_remaining,
-        timeout;
-
-    if (self.Tests === undefined) {
-        throw ("self.Tests does not exist.");
-    }
-    if (self.TestsTimeout === undefined) {
-        self.TestsTimeout = 0;
-    }
-
-    // Wait for all the tests to run because deciding on success.
-    timeout = Number(self.TestsTimeout).toFixed(0);
-    setInterval(function () {
-        test_remaining = Object.keys(self.Tests);
-        if (test_remaining.length === 0) {
-            console.log("Success! ", Date());
-            process.exit(0);
-        } else if (timeout < 1) {
-            console.error("Failed, timed out. Incomplete tests", test_remaining, Date());
-            process.exit(1);
-        } else {
-            console.log("Tests remaining:", test_remaining, "maximum time remaining", timeout, "seconds");
-        }
-        timeout -= 1;
-    }, 1000);
-};
-
-console.log("Starting (opt_test.js) ... " + new Date());
-
-doTest("opt creation", function (test_name) {
-    var opt = OPT.create();
     assert.equal(typeof opt.option, "function", "Should see an exported set()");
     assert.equal(typeof opt.optionWith, "function", "Should see an exported parse()");
-    completedTest(test_name);
-});
-
-doTest("param processing and help()", function (test_name) {
-    var opt = OPT.create(), i, help;
 
     help = function (next_arg) {
         if (next_arg) {
@@ -115,11 +54,10 @@ doTest("param processing and help()", function (test_name) {
         assert.ok(opt.optionWith(test_args[i].args), "Should return true on successful parse(). for args: " + JSON.stringify(test_args[i]));
         assert.equal(help_has_args, test_args[i].help_has_args, "Should have updated help_has_args to " + test_args[i].help_has_args.toString() + " for args: " + JSON.stringify(test_args[i]));
     }
-    completedTest(test_name);
-});
+}, label: "Testing initialization, object creation and help."});
 
 
-doTest("Consumables", function (test_name) {
+harness.push({callback: function () {
     var opt = OPT.create(),
         test_consumable = ["testme", "--database=mydb", "my_rpt"],
         test_result,
@@ -163,10 +101,9 @@ doTest("Consumables", function (test_name) {
     assert.equal(test_result[1], "load-data.js", "Should have load-data.js as test_result[1]" + util.inspect(test_result));
     assert.equal(test_result[2], "some-data.txt", "Should have some-data.txt as test_result[2]");
     assert.equal(test_result.length, 3, "Should only have three args." + util.inspect(test_result));
-    completedTest(test_name);
-});
+}, label: "Testing Consumables"});
 
-doTest("Testing configSync()", function (test_name) {
+harness.push({callback: function () {
     var opt = OPT.create(), test_config = { name: "opt", version: "0.0.1" },
         test_paths = ["package.json"],
         result_config = {},
@@ -219,12 +156,10 @@ doTest("Testing configSync()", function (test_name) {
     Object.keys(result_config).forEach(function (ky) {
         assert.equal(result_config[ky], test_config[ky], ky + " should match");
     });
-
-    completedTest(test_name);
-});
+}, label: "Testing configSync()"});
 
 // Process non-Blocking config
-doTest("Testing config()", function (test_name) {
+harness.push({callback: function () {
     var opt = OPT.create(), test_config = { name: "opt", version: "0.0.1" },
         test_paths = ["package.json"];
 
@@ -277,17 +212,26 @@ doTest("Testing config()", function (test_name) {
         });
     });
 
-    completedTest(test_name);
-}, 15);
+    // Should complete within 15 seconds
+}, label: "Process non-Blocking config"});
 
-doTest("configEvents", function (test_name) {
+
+harness.push({callback: function (test_name) {
     var opt = OPT.create();
 
     opt.config({}, ["examples/config-example-1.conf"]);
     opt.on("ready", function (args) {
         assert.equal(args.greetings, "Hello", "Should have a args.greetings of hello" + util.inspect(args));
-        completedTest(test_name);
     });
-});
+},label: "configEvents"});
 
-monitorTests();
+
+if (require.main === module) {
+    harness.RunIt(path.basename(module.filename), 10, true);
+} else {
+    exports.RunIt = harness.RunIt;
+}
+
+
+
+
