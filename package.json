@@ -24,7 +24,7 @@
         "github-flavored-markdown": "1.0.1"
 	},
 	"scripts" : {
-		"test" : "node opt_test.js"
+		"test" : "node tests/opt_test.js"
 	},
 	"bugs": {
 		"url": "http://github.com/rsdoiel/opt/issues"
