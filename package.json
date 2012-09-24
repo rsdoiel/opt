@@ -21,12 +21,12 @@
 		"npm" : ">= 1.1.30"
 	},
 	"dependencies" : {
-        "github-flavored-markdown": "1.0.1"
+		"github-flavored-markdown": "1.0.1"
 	},
 	"scripts" : {
 		"test" : "node tests/opt_test.js"
 	},
 	"bugs": {
 		"url": "http://github.com/rsdoiel/opt/issues"
-   	}
+	}
 }
