@@ -6,9 +6,8 @@
 // Released under the Simplified BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.9
+// revision: 0.0.10
 //
-
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var fs = require("fs"),
@@ -354,11 +353,11 @@ var restWith = function (request, response) {
 		matching = request.url.match(method[i].re);
 		if (matching !== null) {
 			// Process and trigger event or make callback.
-		if (method[i].callback !== false) {
+			if (method[i].callback !== false) {
 				method[i].callback(request, response, matching, i);
-		} else if (method[i].event_name !== false) {
-			this.emit(method[i].event_name, {request: request, response: response, matching: matching, rule_no: i});
-		}
+			} else if (method[i].event_name !== false) {
+				this.emit(method[i].event_name, {request: request, response: response, matching: matching, rule_no: i});
+			}
 			re_found = true;
 		}
 	}
@@ -370,7 +369,7 @@ var restWith = function (request, response) {
 };
 	
 // unrest = Remove a RESTful rule from processing by restWith();
-// FIXME: need a method to dynamic remove rules if needed.
+// ENHANCEMENT: need a method to dynamic remove rules if needed.
 
 // restHelp - generate documentation on the API run by restWith().
 // @param target {string} either "text", "markdown" or "html". If "html" then 

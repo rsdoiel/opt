@@ -228,7 +228,7 @@ harness.push({callback: function (test_name) {
         assert.equal(args.greetings, "Hello", "Should have a args.greetings of hello" + util.inspect(args));
     });
     harness.completed("configEvents");
-},label: "configEvents"});
+}, label: "configEvents"});
 
 
 if (require.main === module) {
