@@ -24,9 +24,9 @@
 		"harness": "= 0.0.2"
 	},
 	"scripts" : {
-		"test" : "node opt_test.js"
+		"test" : "node tests/opt_test.js"
 	},
 	"bugs": {
 		"url": "http://github.com/rsdoiel/opt/issues"
-   	}
+	}
 }

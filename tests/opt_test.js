@@ -7,7 +7,7 @@
 // Released under the Simplified BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.7
+// revision: 0.0.9
 //
 
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
@@ -20,18 +20,18 @@ var fs = require("fs"),
     OPT = require("../opt");
 
 var help_has_args = false,
-    test_args = [
-        { args : ["testme", "-h", "something else"], help_has_args : true, r : "something else" },
-        { args : ["testme", "--help", "something else"], help_has_args : true, r : "something else" },
-        { args : ["testme", "--help=\"something else\""], help_has_args : true, r : "something else" },
-        { args : ["testme", "--help='something else'"], help_has_args : true, r : "something else" },
-        { args : ["testme", "--help=something_else"], help_has_args : true, r : "something_else" },
-        { args : ["testme", "-h"], help_has_args : false, r : false },
-        { args : ["testme", "--help"], help_has_args : false, r : false }
-    ],
-    test_no = 0,
-    package_json = fs.readFileSync("package.json").toString(),
-    package_obj = JSON.parse(package_json);
+	test_args = [
+		{ args : ["testme", "-h", "something else"], help_has_args : true, r : "something else" },
+		{ args : ["testme", "--help", "something else"], help_has_args : true, r : "something else" },
+		{ args : ["testme", "--help=\"something else\""], help_has_args : true, r : "something else" },
+		{ args : ["testme", "--help='something else'"], help_has_args : true, r : "something else" },
+		{ args : ["testme", "--help=something_else"], help_has_args : true, r : "something_else" },
+		{ args : ["testme", "-h"], help_has_args : false, r : false },
+		{ args : ["testme", "--help"], help_has_args : false, r : false }
+	],
+	test_no = 0,
+	package_json = fs.readFileSync("package.json").toString(),
+	package_obj = JSON.parse(package_json);
 
 
 harness.push({callback: function () {
@@ -221,7 +221,7 @@ harness.push({callback: function () {
 
 
 harness.push({callback: function (test_name) {
-    var opt = OPT.create();
+	var opt = OPT.create();
 
     opt.config({}, ["examples/config-example-1.conf"]);
     opt.on("ready", function (args) {
@@ -234,7 +234,7 @@ harness.push({callback: function (test_name) {
 if (require.main === module) {
     harness.RunIt(path.basename(module.filename), 10);
 } else {
-    exports.RunIt = harness.RunIt;
+	exports.RunIt = harness.RunIt;
 }
 
 
