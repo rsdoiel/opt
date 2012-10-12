@@ -16,7 +16,7 @@ var fs = require("fs"),
     path = require("path"),
     util = require("util"),
     assert = require("assert"),
-    harness = require("../lib/harness"),
+    harness = require("harness"),
     OPT = require("../opt");
 
 var help_has_args = false,
@@ -54,6 +54,7 @@ harness.push({callback: function () {
         assert.ok(opt.optionWith(test_args[i].args), "Should return true on successful parse(). for args: " + JSON.stringify(test_args[i]));
         assert.equal(help_has_args, test_args[i].help_has_args, "Should have updated help_has_args to " + test_args[i].help_has_args.toString() + " for args: " + JSON.stringify(test_args[i]));
     }
+    harness.completed("Testing initialization, object creation and help.");
 }, label: "Testing initialization, object creation and help."});
 
 
@@ -101,6 +102,7 @@ harness.push({callback: function () {
     assert.equal(test_result[1], "load-data.js", "Should have load-data.js as test_result[1]" + util.inspect(test_result));
     assert.equal(test_result[2], "some-data.txt", "Should have some-data.txt as test_result[2]");
     assert.equal(test_result.length, 3, "Should only have three args." + util.inspect(test_result));
+    harness.completed("Testing Consumables");
 }, label: "Testing Consumables"});
 
 harness.push({callback: function () {
@@ -156,6 +158,7 @@ harness.push({callback: function () {
     Object.keys(result_config).forEach(function (ky) {
         assert.equal(result_config[ky], test_config[ky], ky + " should match");
     });
+    harness.completed("Testing configSync()");
 }, label: "Testing configSync()"});
 
 // Process non-Blocking config
@@ -213,6 +216,7 @@ harness.push({callback: function () {
     });
 
     // Should complete within 15 seconds
+    harness.completed("Process non-Blocking config");
 }, label: "Process non-Blocking config"});
 
 
@@ -223,11 +227,12 @@ harness.push({callback: function (test_name) {
     opt.on("ready", function (args) {
         assert.equal(args.greetings, "Hello", "Should have a args.greetings of hello" + util.inspect(args));
     });
+    harness.completed("configEvents");
 },label: "configEvents"});
 
 
 if (require.main === module) {
-    harness.RunIt(path.basename(module.filename), 10, true);
+    harness.RunIt(path.basename(module.filename), 10);
 } else {
     exports.RunIt = harness.RunIt;
 }
