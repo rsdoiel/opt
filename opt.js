@@ -93,7 +93,7 @@ var helpText = function (msg) {
 
 // optionWith the options provided. It does not alter process.argv
 // @param argv {object} usually process.argv
-// @return {object} or {boolean} return true if succesful or the modified argv is consumable is used.
+// @return {object} or {boolean} return true if successful or the modified argv is consumable is used.
 var optionWith = function (argv) {
 	var self = this, i = 0, output_argv = [], parts;
 
@@ -160,7 +160,6 @@ var usage = function (msg, error_level) {
 
 	if (error_level === undefined || error_level === 0) {
 		error_level = 0;
-		/**/
 		if (this.heading) {
 			console.log(" " + this.heading.trim() + "\n");
 		}
@@ -184,10 +183,7 @@ var usage = function (msg, error_level) {
 		if (this.copyright) {
 			console.log(" " + this.copyright.trim() + "\n");
 		}
-		/**/
-		console.log(this.helpText(msg));
 	} else {
-		/**/
 		if (this.heading) {
 			console.error(" " + this.heading.trim() + "\n");
 		}
@@ -216,8 +212,6 @@ var usage = function (msg, error_level) {
 		if (this.copyright) {
 			console.error(" " + this.copyright.trim() + "\n");
 		}
-		/**/
-		//console.error(this.helpText(msg));
 	}
 	process.exit(error_level);
 };
