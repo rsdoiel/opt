@@ -21,7 +21,7 @@
 		"npm" : ">= 1.1.30"
 	},
 	"dependencies" : {
-		"harness": "= 0.0.2"
+		"harness": ">= 0.0.2"
 	},
 	"scripts" : {
 		"test" : "node tests/opt_test.js"

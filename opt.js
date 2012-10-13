@@ -57,6 +57,39 @@ var consume = function (arg) {
 	this.consumable.push(arg);
 };
 
+// helpText - build simple plain text versions of "Help" from the options
+// defined by opt.option().
+var helpText = function (msg) {
+	var self = this,
+		lines = [];
+	
+	if (this.heading !== undefined) {
+		lines.push(" " + self.heading.trim() + "\n");
+	}
+
+	if (this.synopsis !== undefined) {
+		lines.push(" " + self.synopsis.trim() + "\n");
+	}
+
+	if (this.options !== undefined) {
+		lines.push(" " + self.options.trim() + "\n");
+	}
+
+	Object.keys(self.option_messages).forEach(function (ky) {
+		lines.push("\t" + ky + "\t\t" + self.option_messages[ky].trim() + "\n");
+	});
+	lines.push("\n");
+
+	if (msg !== undefined) {
+		lines.push(" " + msg + "\n");
+	}
+
+	if (this.copyright !== undefined) {
+		lines.push(" " + this.copyright.trim() + "\n");
+	}
+	return lines.join("");
+};
+
 
 // optionWith the options provided. It does not alter process.argv
 // @param argv {object} usually process.argv
@@ -126,6 +159,8 @@ var usage = function (msg, error_level) {
 	var self = this, ky;
 
 	if (error_level === undefined || error_level === 0) {
+		error_level = 0;
+		/**/
 		if (this.heading) {
 			console.log(" " + this.heading.trim() + "\n");
 		}
@@ -149,7 +184,10 @@ var usage = function (msg, error_level) {
 		if (this.copyright) {
 			console.log(" " + this.copyright.trim() + "\n");
 		}
+		/**/
+		console.log(this.helpText(msg));
 	} else {
+		/**/
 		if (this.heading) {
 			console.error(" " + this.heading.trim() + "\n");
 		}
@@ -178,9 +216,8 @@ var usage = function (msg, error_level) {
 		if (this.copyright) {
 			console.error(" " + this.copyright.trim() + "\n");
 		}
-	}
-	if (error_level === undefined) {
-		error_level = 0;
+		/**/
+		//console.error(this.helpText(msg));
 	}
 	process.exit(error_level);
 };
@@ -382,7 +419,7 @@ var restHelp = function (target) {
 	case 'markdown':
 		return "markdown Not Implemented Yet!";
 	default:
-		return "plain text Not Implemented Yet!";
+		return this.helpText();
 	}
 };
 
@@ -403,22 +440,20 @@ var create = function () {
 		this.copyright = false;
 		this.consumable = [];
 
+		this.consume = consume;
+		this.usage = usage;
+		this.helpText = helpText;
+		this.configSync = configSync;
+		this.config = config;
+		
 		this.option = option;
 		this.optionWith = optionWith;
 		this.optionHelp = optionHelp;
-		this.consume = consume;
 
-		this.usage = usage;
-		this.configSync = configSync;
-		this.config = config;
 		this.rest = rest;
 		this.restWith = restWith;
 		this.restHelp = restHelp;
 						
-		this.set = option; // set() is depreciated in favaor of option()
-		this.parse = optionWith; // parse() is depreciated in favor of optionWith();
-		this.setup = optionHelp; // setup() is depcreciated in favor of setopHelp();
-
 		events.EventEmitter.call(this);
 	};
 	util.inherits(Opt, events.EventEmitter);
@@ -427,19 +462,17 @@ var create = function () {
 };
 
 exports.create = create;
-exports.option = option;
-exports.optionWith = optionWith;
-exports.optionHelp = optionHelp;
-exports.rest = rest;
-exports.restWith = restWith;
-exports.restHelp = restHelp;
+exports.helpText = helpText;
 exports.consume = consume;
-
 exports.usage = usage;
 exports.configSync = configSync;
 exports.config = config;
 
-exports.set = option; // set() is depreciated in favor of option()
-exports.parse = optionWith; // parse() is depreciated in favor of optionWith()
-exports.setup = optionHelp; // setup() is depreciated in favor of optionHelp()
+exports.option = option;
+exports.optionWith = optionWith;
+exports.optionHelp = optionHelp;
+
+exports.rest = rest;
+exports.restWith = restWith;
+exports.restHelp = restHelp;
 

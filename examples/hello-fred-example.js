@@ -2,7 +2,7 @@
 // hello-fred-example.js - demonstrate supporting a configuration file
 // with command line overrides.
 //
-/*jslint node: true */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 "use strict";
 
 /*

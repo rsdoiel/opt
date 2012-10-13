@@ -1,7 +1,7 @@
 //
 // Demo a simple configuration processing
 //
-/*jslint node:true */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var path = require("path"),
 	opt = require("../opt").create();

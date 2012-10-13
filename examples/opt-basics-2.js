@@ -1,7 +1,7 @@
-
 //
 // Putting it all together.
 //
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 // Importing some modules
 var util = require("util"),

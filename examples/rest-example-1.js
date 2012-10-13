@@ -7,14 +7,14 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-/*jslint node: true, sloppy: true */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var fs = require('fs'),
     path = require("path"),
     http = require('http'),
     opt = require("../opt").create();
 
-var config = { name: "fred", email: "fred@example.com", host: "localhost", port: "8123" },
+var config = { name: "fred", email: "fred@example.com", host: "localhost", port: 8080 },
 	search_paths = [ "config-example-1.conf",
 			path.join(process.env.HOME, ".config-examplerc"),
 			"/usr/local/etc/config-example.conf",
@@ -31,30 +31,31 @@ opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
 	" See: http://opensource.org/licenses/bsd-license.php\n");
 
 
+// Bind some paths to events.
 // Setup some event handlers to process the web requests
-opt.on("homepage", function (request, response, matching, rule_no) {
+opt.rest("get", /^(\/$|\/index\.html)/, function (request, response, matching, rule_no) {
+	var page = "<!DOCTYPE html>\n<html><body><a href=\"/hello\">Hello</a></body></html>";
     console.log("homepage:", matching, rule_no);
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.end("<DOCTYPE html>\n<html><body><a href=\"/hello\">Hello</a></body></html>");
+    response.writeHead(200, {
+    	'Content-Type': 'text/html',
+    	'Content-Length': page.length
+    });
+    response.end(page);
 });
 
-opt.on("helloworld", function (request, response, matching, rule_no) {
-    console.log("helloworld:", matching, rule_no);
+opt.rest("get", "/hello", function (request, response, matching, rule_no) {
+    console.log("/hello:", matching, rule_no);
     response.writeHead(200, {'Content-Type': 'text/html'});
     response.end("<DOCTYPE html>\n<html><body>Hello World</html>");
 });
 
-opt.on("status404", function (request, response, matching, rule_no) {
+// Default catch all path. Assume if another rule didn't catch it then we have a 404
+opt.rest("get", new RegExp("^/*"), function (request, response, matching, rule_no) {
     console.log("status404", matching, rule_no);
     response.writeHead(404, {'Content-Type': 'text/html'});
     response.end("<DOCTYPE html>\n<html><body>404, File not found</body></html>");
 });
 
-// Bind some paths to events.
-opt.rest("get", new RegExp("/index.html|^/$|^$"), "homepage");
-opt.rest("get", new RegExp("/hello"), "helloworld");
-// Default catch all path. Assume if another rule didn't catch it then we have a 404
-opt.rest("get", new RegExp("^/*"), "status404");
 
 opt.on("ready", function (config) {
 

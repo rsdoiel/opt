@@ -34,7 +34,7 @@ var help_has_args = false,
 	package_obj = JSON.parse(package_json);
 
 
-harness.push({callback: function () {
+harness.push({callback: function (test_label) {
     var opt = OPT.create(), i, help;
 
     assert.equal(typeof opt.option, "function", "Should see an exported set()");
@@ -54,11 +54,11 @@ harness.push({callback: function () {
         assert.ok(opt.optionWith(test_args[i].args), "Should return true on successful parse(). for args: " + JSON.stringify(test_args[i]));
         assert.equal(help_has_args, test_args[i].help_has_args, "Should have updated help_has_args to " + test_args[i].help_has_args.toString() + " for args: " + JSON.stringify(test_args[i]));
     }
-    harness.completed("Testing initialization, object creation and help.");
+    harness.completed(test_label);
 }, label: "Testing initialization, object creation and help."});
 
 
-harness.push({callback: function () {
+harness.push({callback: function (test_label) {
     var opt = OPT.create(),
         test_consumable = ["testme", "--database=mydb", "my_rpt"],
         test_result,
@@ -102,10 +102,10 @@ harness.push({callback: function () {
     assert.equal(test_result[1], "load-data.js", "Should have load-data.js as test_result[1]" + util.inspect(test_result));
     assert.equal(test_result[2], "some-data.txt", "Should have some-data.txt as test_result[2]");
     assert.equal(test_result.length, 3, "Should only have three args." + util.inspect(test_result));
-    harness.completed("Testing Consumables");
+    harness.completed(test_label);
 }, label: "Testing Consumables"});
 
-harness.push({callback: function () {
+harness.push({callback: function (test_label) {
     var opt = OPT.create(), test_config = { name: "opt", version: "0.0.1" },
         test_paths = ["package.json"],
         result_config = {},
@@ -158,11 +158,11 @@ harness.push({callback: function () {
     Object.keys(result_config).forEach(function (ky) {
         assert.equal(result_config[ky], test_config[ky], ky + " should match");
     });
-    harness.completed("Testing configSync()");
+    harness.completed(test_label);
 }, label: "Testing configSync()"});
 
 // Process non-Blocking config
-harness.push({callback: function () {
+harness.push({callback: function (test_label) {
     var opt = OPT.create(), test_config = { name: "opt", version: "0.0.1" },
         test_paths = ["package.json"];
 
@@ -216,20 +216,68 @@ harness.push({callback: function () {
     });
 
     // Should complete within 15 seconds
-    harness.completed("Process non-Blocking config");
+    harness.completed(test_label);
 }, label: "Process non-Blocking config"});
 
+harness.push({callback: function (test_label) {
+	var opt = OPT.create(), msg;
+	
+	// Setup command line arg processing
+	opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
+		"SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n ",
+		"OPTIONS",
+		"Copyright notice would go here.");
+	assert.ok(opt.heading, "Should have a page heading now");
+	assert.ok(opt.synopsis, "Should have a synopsis section now");
+	assert.ok(opt.options, "Should have a options heading now");
+	assert.ok(opt.copyright, "Should have copyright set now.")
+	
+	opt.option(["-h", "--help"], function (param) {
+		console.log("defined help.");
+	}, "This help test.");
+	msg = opt.helpText();
+	assert.ok(msg, "Should have opt.helpText() output:" + opt.helpText());
+	harness.completed(test_label);
+}, label: "helpText"});
 
-harness.push({callback: function (test_name) {
+
+harness.push({callback: function (test_label) {
 	var opt = OPT.create();
 
     opt.config({}, ["examples/config-example-1.conf"]);
     opt.on("ready", function (args) {
         assert.equal(args.greetings, "Hello", "Should have a args.greetings of hello" + util.inspect(args));
     });
-    harness.completed("configEvents");
+    harness.completed(test_label);
 }, label: "configEvents"});
 
+harness.push({callback: function (test_label) {
+	var opt = OPT.create();
+
+    opt.config({}, ["examples/config-example-1.conf"]);
+    opt.on("ready", function (config) {
+	// Setup command line arg processing
+		opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
+			"SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n ",
+			"OPTIONS",
+			"Copyright notice would go here.");
+		assert.ok(opt.heading, "Should have a page heading now");
+		assert.ok(opt.synopsis, "Should have a synopsis section now");
+		assert.ok(opt.options, "Should have a options heading now");
+		assert.ok(opt.copyright, "Should have copyright set now.")
+		
+    	opt.option(["-T"], function (param) {
+    		assert.equal(param, "'hello world'", "Should have param set to 'hello world'" + util.inspect(param));
+    		config.help = param;
+    	});
+    	opt.optionWith(["-T", "'hello world'"]);
+        assert.equal(config.greetings, "Hello",
+        	"Should have a args.greetings of hello" + util.inspect(config));
+        assert.equal(config.help, "'hello world'",
+        	"Should have -H set." + util.inspect(config));
+    });
+    harness.completed(test_label);
+}, label: "configEventsAndOptions"});
 
 if (require.main === module) {
     harness.RunIt(path.basename(module.filename), 10);
