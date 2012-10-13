@@ -57,20 +57,20 @@ var homepage = function (request, response, matching, rule_no) {
 
     console.log("Home page request", matching, "matching rule", rule_no);
     response.end(h.html(
-    	h.head(
-    		h.title("md-sever.js, an opt web example.")
-    	),
-    	h.body(
-    		h.h1("md-server.js example"),
-    		h.dl(
-    			h.dt("Requested URL"),
-    			h.dd(request.url),
-    			h.dt("Matching"),
-    			h.dd(String(matching)),
-    			h.dt("Rule No."),
-    			h.dd(rule_no)
-    		)
-    	)
+		h.head(
+			h.title("md-sever.js, an opt web example.")
+		),
+		h.body(
+			h.h1("md-server.js example"),
+			h.dl(
+				h.dt("Requested URL"),
+				h.dd(request.url),
+				h.dt("Matching"),
+				h.dd(String(matching)),
+				h.dt("Rule No."),
+				h.dd(rule_no)
+			)
+		)
     ));
 };
 
@@ -86,7 +86,7 @@ var markdown_page = function (request, response, matching, rule_no) {
 		} else if (buf) {
 			content = ghm.parse(buf.toString());
 		} else {
-			content = "No content"
+			content = "No content";
 		}
 		
 		// Process the markdown file if it exists
@@ -117,39 +117,39 @@ var status404 = function (request, response, matching, rule_no) {
 
     console.log("404 page", matching, "matching rule", rule_no);
     response.end(h.html(
-    	h.head(
-    		h.title("404, File not found")
-    	),
-    	h.body(
-    		h.h1("404 File not found"),
-    		h.dl(
-    			h.dt("Requested URL"),
-    			h.dd(request.url),
-    			h.dt("Matching"),
-    			h.dd(String(matching)),
-    			h.dt("Rule No."),
-    			h.dd(rule_no)
-    		)
-    	)
+		h.head(
+			h.title("404, File not found")
+		),
+		h.body(
+			h.h1("404 File not found"),
+			h.dl(
+				h.dt("Requested URL"),
+				h.dd(request.url),
+				h.dt("Matching"),
+				h.dd(String(matching)),
+				h.dt("Rule No."),
+				h.dd(rule_no)
+			)
+		)
     ));
 };
     
 // Bind them to some RESTful requests
 
 // Now define a rule for the markdown page
-opt.rest("get", new RegExp("\.md$"), markdown_page,
+opt.rest("get", /\.md$/i, markdown_page,
 	"Display a markdown page.");
 
 // Handle the homepage request
-opt.rest("get", new RegExp("^(|\/|\/index\.html)$"), homepage,
+opt.rest("get", /^(|\/|\/index\.html)$/i, homepage,
 	"Show server homepage. List the Markdown files available for viewing.");
 
 // Handle the help page request.
-opt.rest("get", new RegExp("^/help$", "i"), help,
+opt.rest("get", /^\/help$/i, help,
 	"Show help documentation for server.");
 
 // Handle 404 errors
-opt.rest("get", new RegExp("^/*"), status404,
+opt.rest("get", /^\/*/, status404,
 	"Show the 404 Page.");
 
 

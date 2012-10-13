@@ -230,7 +230,7 @@ harness.push({callback: function (test_label) {
 	assert.ok(opt.heading, "Should have a page heading now");
 	assert.ok(opt.synopsis, "Should have a synopsis section now");
 	assert.ok(opt.options, "Should have a options heading now");
-	assert.ok(opt.copyright, "Should have copyright set now.")
+	assert.ok(opt.copyright, "Should have copyright set now.");
 	
 	opt.option(["-h", "--help"], function (param) {
 		console.log("defined help.");
@@ -264,17 +264,18 @@ harness.push({callback: function (test_label) {
 		assert.ok(opt.heading, "Should have a page heading now");
 		assert.ok(opt.synopsis, "Should have a synopsis section now");
 		assert.ok(opt.options, "Should have a options heading now");
-		assert.ok(opt.copyright, "Should have copyright set now.")
+		assert.ok(opt.copyright, "Should have copyright set now.");
 		
-    	opt.option(["-T"], function (param) {
-    		assert.equal(param, "'hello world'", "Should have param set to 'hello world'" + util.inspect(param));
-    		config.help = param;
-    	});
-    	opt.optionWith(["-T", "'hello world'"]);
+		opt.option(["-T"], function (param) {
+			assert.equal(param, "'hello world'", "Should have param set to 'hello world'" + util.inspect(param));
+			config.help = param;
+		});
+
+		opt.optionWith(["-T", "'hello world'"]);
         assert.equal(config.greetings, "Hello",
-        	"Should have a args.greetings of hello" + util.inspect(config));
+			"Should have a args.greetings of hello" + util.inspect(config));
         assert.equal(config.help, "'hello world'",
-        	"Should have -H set." + util.inspect(config));
+			"Should have -H set." + util.inspect(config));
     });
     harness.completed(test_label);
 }, label: "configEventsAndOptions"});

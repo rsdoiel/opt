@@ -1,3 +1,4 @@
+
 //
 // rest-example-1.js - a simple example of using opt to create a web service.
 //
@@ -35,12 +36,12 @@ opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
 // Setup some event handlers to process the web requests
 opt.rest("get", /^(\/$|\/index\.html)/, function (request, response, matching, rule_no) {
 	var page = "<!DOCTYPE html>\n<html><body><a href=\"/hello\">Hello</a></body></html>";
-    console.log("homepage:", matching, rule_no);
-    response.writeHead(200, {
-    	'Content-Type': 'text/html',
-    	'Content-Length': page.length
-    });
-    response.end(page);
+	console.log("homepage:", matching, rule_no);
+	response.writeHead(200, {
+		'Content-Type': 'text/html',
+		'Content-Length': page.length
+	});
+	response.end(page);
 });
 
 opt.rest("get", "/hello", function (request, response, matching, rule_no) {

@@ -40,15 +40,15 @@ opt.on("ready", function (config) {
 
     // Define you restful service
     opt.on("helloworld", function (data) {
-    	var req = data.request, res = data.response,
-            matching = data.matching, rule_no = data.rule_no;
-	    
-        res.writeHead(200, {"content-type": "text/plain"});
-        res.end("Hello " + config.name + ".\nThis is what I found: " + util.inspect(matching) + "\nRule No.:" + rule_no);
+		var req = data.request, res = data.response,
+			matching = data.matching, rule_no = data.rule_no;
+		
+		res.writeHead(200, {"content-type": "text/plain"});
+		res.end("Hello " + config.name + ".\nThis is what I found: " + util.inspect(matching) + "\nRule No.:" + rule_no);
     });
 
     opt.on("status404", function (data) {
-    	var res = data.response, req = data.request;
+		var res = data.response, req = data.request;
         res.writeHead(404, {"content-type": "text/plain"});
         res.end("File not found. " + req.url);
     });
