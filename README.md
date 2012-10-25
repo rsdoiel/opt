@@ -127,7 +127,7 @@ Display a help message with -h and --help on the command line.
 			opt.usage();
 		}, "This help document.");
 	
-		opt.optionWith(process.argv[1]);
+		opt.optionWith(process.argv);
 	
 		// config should now hold the merge configuration
 		// from default_config and the first configuration file 
