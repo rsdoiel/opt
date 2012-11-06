@@ -1,32 +1,41 @@
 [![build status](https://secure.travis-ci.org/rsdoiel/opt.png)](http://travis-ci.org/rsdoiel/opt)
 opt
 ===
-revision 0.0.10
----------------
+
 
 ### Why another command line argument processor?
 
 There are three reasons I created opt.js
 
-* I wanted to simplify the boilerplate I used with JSON based configuration files including handling a set of search paths (e.g. look sequentially in
-* I wanted a very simple command line option parser that included automatically generating a help page (I'm forgetful about updating docs outside of 
-* I wanted a simple http route process that generate docs like I used for the command line
+* I wanted to simplify the boilerplate I used with JSON based configuration files including handling a set of search paths (e.g. look sequentially in a list of paths for a configuration file)
+* I wanted a very simple command line option parser that included automatically generate a help page (I'm forgetful about updating docs outside of my code)
+* I wanted a simple http route library that generate docs like I used for the command line
 
-That was my itch.  There are many file example of options parsing libraries in Node but they didn't quite scratch the itch I had.
+That was my itch.  There are many fine existing options parsing libraries in Node but they didn't quite scratch the itch I had.
 
 
 # Overview
 
-opt is a toolkit for building either command line programs and RESTful
-web services. It uses a common pattern for setting up and processing
-JSON based configuration files, command line options and RESTful API
-calls.
+opt is a toolkit for building command line programs and RESTful
+web services. It uses a common idiom for setting up and processing
+JSON based configuration files, command line options parsing and 
+defining a RESTful API calls.
 
-Using the module is usually invoked by
+Use the module by invoking opt's constructor Opt() or
+opt.create() method..
+
 
 ```javascript
-	var opt = require("opt").create();
+	var options = require("opt"),
+	    opt = new options.Opt();
 ```
+
+```javascript
+	var options = require("opt"),
+		opt = options.create();
+```
+
+
 It is available from github at https://github.com/rsdoiel/opt and
 can be installed using npm
 
@@ -52,7 +61,7 @@ This is the synchronous version.
 	"use strict";
 
 	var path = require("path"),
-	    opt = require("../opt").create();
+	    opt = require("opt").create();
 
 	    var config = { name: "fred", email: "fred@example.com" },
 	    	search_paths = [ "config-example-1.conf",
@@ -81,7 +90,7 @@ Display a help message with -h and --help on the command line.
 	"use strict";
 	
 	var path = require("path"),
-		opt = require("../opt").create();
+		opt = require("opt").create();
 	
 	var config = { name: "fred", email: "fred@example.com" },
 		search_paths = [ "config-example-1.conf",
@@ -144,7 +153,7 @@ Display a help message with -h and --help on the command line.
 		http = require("http"),
 		path = require("path"),
 		// import and create the opt object
-		opt = require("../opt").create();
+		opt = require("opt").create();
 	
 	// Define your configuration defaults and load your local configuration
 	// file or it.
