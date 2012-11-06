@@ -16,7 +16,7 @@ var fs = require("fs"),
     http = require("http"),
     ghm = require("github-flavored-markdown"),
     tbone = require("tbone"),
-    opt = require("../opt").create(),
+    opt = new (require("../opt")).Opt(),
     default_config = {
         port: 8080,
         host: "localhost",

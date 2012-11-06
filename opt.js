@@ -156,62 +156,37 @@ var optionHelp = function (heading, synopsis, options, copyright) {
 // @param msg {string} optional message to include in the usage text rendered
 // @param error_level {number} an integer, 0 is no error, greater then zero is an OS level error level.
 var usage = function (msg, error_level) {
-	var self = this, ky;
+	var self = this, ky, print = console.log;
 
 	if (error_level === undefined || error_level === 0) {
 		error_level = 0;
-		if (this.heading) {
-			console.log(" " + this.heading.trim() + "\n");
-		}
-	
-		if (this.synopsis) {
-			console.log(" " + this.synopsis.trim() + "\n");
-		}
-	
-		if (this.options) {
-			console.log(" " + this.options.trim() + "\n");
-		}
-
-		Object.keys(this.option_messages).forEach(function (ky) {
-			console.log("\t" + ky + "\t\t" + self.option_messages[ky].trim() + "\n");
-		});
-
-		if (msg !== undefined) {
-			console.log(" " + msg + "\n");
-		}
-	
-		if (this.copyright) {
-			console.log(" " + this.copyright.trim() + "\n");
-		}
+		println = console.log;
 	} else {
-		if (this.heading) {
-			console.error(" " + this.heading.trim() + "\n");
-		}
-	
-		if (this.synopsis) {
-			console.error(" " + this.synopsis.trim() + "\n");
-		}
-	
-		if (this.options) {
-			console.error(" " + this.options.trim() + "\n");
-		}
+		println = console.error;	
+	}
 
-		if (msg !== undefined) {
-			console.error(" " + msg + "\n");
-		} else {
-			console.error("ERROR: process exited with an error " + error_level);
-		}
+	if (this.heading) {
+		println(" " + this.heading + "\n");
+	}
 
-		Object.keys(self.option_messages).forEach(function (ky) {
-			console.error("\t" + ky + "\t\t" + self.option_messages[ky]);
-		});
-		console.log("\n");
-		if (msg !== undefined) {
-			console.error(" " + msg + "\n");
-		}
-		if (this.copyright) {
-			console.error(" " + this.copyright.trim() + "\n");
-		}
+	if (this.synopsis) {
+		println(" " + this.synopsis + "\n");
+	}
+
+	if (this.options) {
+		println(" " + this.options + "\n");
+	}
+
+	Object.keys(this.option_messages).forEach(function (ky) {
+		println("\t" + ky + "\t\t" + self.option_messages[ky].trim() + "\n");
+	});
+
+	if (msg !== undefined) {
+		println(" " + msg + "\n");
+	}
+
+	if (this.copyright) {
+		println(" " + this.copyright + "\n");
 	}
 	process.exit(error_level);
 };
@@ -421,40 +396,41 @@ var restHelp = function (target) {
 // version of opt. 
 // @constructor
 // @return {object} a new instance of the Opt object
-var create = function () {
-	var Opt = function () {
-		this.opts = {};
-		this.option_messages = {};
-		this.restful = {};
-		this.restful_messages = {};
-		this.consumable = [];
-		this.heading = false;
-		this.synopsis = false;
-		this.options = false;
-		this.copyright = false;
-		this.consumable = [];
-
-		this.consume = consume;
-		this.usage = usage;
-		this.helpText = helpText;
-		this.configSync = configSync;
-		this.config = config;
-		
-		this.option = option;
-		this.optionWith = optionWith;
-		this.optionHelp = optionHelp;
-
-		this.rest = rest;
-		this.restWith = restWith;
-		this.restHelp = restHelp;
-						
-		events.EventEmitter.call(this);
-	};
-	util.inherits(Opt, events.EventEmitter);
+var Opt = function () {
+	this.opts = {};
+	this.option_messages = {};
+	this.restful = {};
+	this.restful_messages = {};
+	this.consumable = [];
+	this.heading = false;
+	this.synopsis = false;
+	this.options = false;
+	this.copyright = false;
+	this.consumable = [];
 	
+	events.EventEmitter.call(this);
+};
+util.inherits(Opt, events.EventEmitter);
+
+Opt.prototype.consume = consume;
+Opt.prototype.usage = usage;
+Opt.prototype.helpText = helpText;
+Opt.prototype.configSync = configSync;
+Opt.prototype.config = config;
+	
+Opt.prototype.option = option;
+Opt.prototype.optionWith = optionWith;
+Opt.prototype.optionHelp = optionHelp;
+
+Opt.prototype.rest = rest;
+Opt.prototype.restWith = restWith;
+Opt.prototype.restHelp = restHelp;
+
+var create = function () {
 	return new Opt();
 };
 
+exports.Opt = Opt;
 exports.create = create;
 exports.helpText = helpText;
 exports.consume = consume;
