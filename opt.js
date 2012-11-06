@@ -64,15 +64,15 @@ var helpText = function (msg) {
 		lines = [];
 	
 	if (this.heading !== undefined) {
-		lines.push(" " + self.heading.trim() + "\n");
+		lines.push(" " + self.heading + "\n");
 	}
 
 	if (this.synopsis !== undefined) {
-		lines.push(" " + self.synopsis.trim() + "\n");
+		lines.push(" " + self.synopsis + "\n");
 	}
 
 	if (this.options !== undefined) {
-		lines.push(" " + self.options.trim() + "\n");
+		lines.push(" " + self.options + "\n");
 	}
 
 	Object.keys(self.option_messages).forEach(function (ky) {
@@ -85,7 +85,7 @@ var helpText = function (msg) {
 	}
 
 	if (this.copyright !== undefined) {
-		lines.push(" " + this.copyright.trim() + "\n");
+		lines.push(" " + this.copyright + "\n");
 	}
 	return lines.join("");
 };
@@ -377,19 +377,10 @@ var restWith = function (request, response) {
 // unrest = Remove a RESTful rule from processing by restWith();
 // ENHANCEMENT: need a method to dynamic remove rules if needed.
 
-// restHelp - generate documentation on the API run by restWith().
-// @param target {string} either "text", "markdown" or "html". If "html" then 
-// render using github-markdown-flavor module.
+// restHelp - generate documentation on the API invoked by restWith().
 // @return {string}
-var restHelp = function (target) {
-	switch (target) {
-	case 'html':
-		return "html Not Implemented Yet!";
-	case 'markdown':
-		return "markdown Not Implemented Yet!";
-	default:
-		return this.helpText();
-	}
+var restHelp = function () {
+	return this.helpText();
 };
 
 // A constructor to created an EventEmitter
