@@ -7,26 +7,37 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-/*jslint node: true */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 "use strict";
 
 var util = require("util"),
-	opt = require("../opt").create();
+	path = require("path"),
+	opt = require("../opt").create(),
+	program_name = path.basename(process.argv[1]),
+	message,
+	args;
 
-opt.optionHelp("USAGE node example-1.js.",
-	"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node example-1.js --help",
+opt.optionHelp("USAGE node " + program_name,
+	"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node " +
+		program_name +
+		" --help",
 	"OPTIONS:",
 	" copyright (c) 2012 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
 	" See: http://opensource.org/licenses/bsd-license.php\n");
 
+opt.option(["-m", "--message"], function (param) {
+	message = param;
+	opt.consume(param);
+}, "message to display");
 opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help document.");
 
 // Parse the command line options
-if (process.argv.length < 3) {
-	console.log("Try using a command line option for demo:\n" + opt.usage());
+args = opt.optionWith(process.argv);
+if (message) {
+	console.log(message);
 } else {
-	opt.optionWith(process.argv);
+	opt.usage("Try using a command line option for demo:\n", 1);
 }

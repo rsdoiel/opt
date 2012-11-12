@@ -1,8 +1,8 @@
 //
 // Show the use of consumable args and rendering a resulting
-// argv from opt.parse(process.argv).
+// argv from opt.optionWith(process.argv).
 //
-/*jslint node: true */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 "use strict";
 
 /* Example output:
@@ -52,32 +52,32 @@ var util = require("util"),
 	collection_name = false,
 	new_args = [];
 
-opt.setup("USAGE: node " + path.basename(process.argv[1]) + " [options] input_name output_name",
+opt.optionHelp("USAGE: node " + path.basename(process.argv[1]) + " [options] input_name output_name",
         "SYNOPSIS: Show how you can make a simple command line program using consumable args.",
         "OPTIONS:",
         " Example Organization Name here\n" +
         " Some copyright statement here.");
 
 opt.consume(true);// Turn on argument consumption
-opt.set(["-d", "--database"], function (param) {
+opt.option(["-d", "--database"], function (param) {
 	database_name = param;
 	opt.consume(param);
 }, "Set the database name.");
-opt.set(["-c", "--collection"], function (param) {
+opt.option(["-c", "--collection"], function (param) {
 	collection_name = param;
 	opt.consume(param);
 }, "Set the collection name.");
-opt.set(["-i", "--input"], function (param) {
+opt.option(["-i", "--input"], function (param) {
 	input_name = param;
 	opt.consume(param);
 });
-opt.set(["-o", "--output"], function (param) {
+opt.option(["-o", "--output"], function (param) {
 }, "Set the output name.");
-opt.set(["-h", "--help"], function () {
+opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help page.");
 
-new_args = opt.parse(process.argv);
+new_args = opt.optionWith(process.argv);
 if (new_args[1] !== undefined) {
 	input_name = new_args[1];
 }

@@ -1,7 +1,7 @@
 {
 	"name" : "opt",
-	"version" : "0.0.9",
-	"description" : "A configuration, cmd line options and RESTful web processor module for NodeJS.",
+	"version" : "0.1.11",
+	"description" : "A configuration, cmd line options and RESTful web processor module for NodeJS. A simple help text is also automatically generated based if the command line options or RESTful paths you define so you don't have to remember to do that later.",
 	"main" : "./opt.js",
 	"repository" : {
 		"type" : "git", 
@@ -21,7 +21,7 @@
 		"npm" : ">= 1.1.30"
 	},
 	"dependencies" : {
-		"github-flavored-markdown": "1.0.1"
+		"harness": ">= 0.0.2"
 	},
 	"scripts" : {
 		"test" : "node tests/opt_test.js"

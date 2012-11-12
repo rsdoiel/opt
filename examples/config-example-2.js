@@ -1,7 +1,7 @@
 //
 // Demo a simple asynchronous configuration processing
 //
-/*jslint node: true */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 "use strict";
 
 var path = require("path"),
@@ -9,6 +9,7 @@ var path = require("path"),
 
 var config = { name: "fred", "email": "fred@example.com" },
 	search_paths = [ "config-example-1.conf",
+			"examples/config-example-1.conf",
 			path.join(process.env.HOME, ".fredrc"),
 			"/usr/local/etc/fred.conf",
 			"/usr/etc/fred.conf",

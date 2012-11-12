@@ -6,9 +6,8 @@
 // Released under the Simplified BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.9
+// revision: 0.0.10
 //
-
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 
 var fs = require("fs"),
@@ -58,10 +57,43 @@ var consume = function (arg) {
 	this.consumable.push(arg);
 };
 
+// helpText - build simple plain text versions of "Help" from the options
+// defined by opt.option().
+var helpText = function (msg) {
+	var self = this,
+		lines = [];
+	
+	if (this.heading !== undefined) {
+		lines.push(" " + self.heading + "\n");
+	}
+
+	if (this.synopsis !== undefined) {
+		lines.push(" " + self.synopsis + "\n");
+	}
+
+	if (this.options !== undefined) {
+		lines.push(" " + self.options + "\n");
+	}
+
+	Object.keys(self.option_messages).forEach(function (ky) {
+		lines.push("\t" + ky + "\t\t" + self.option_messages[ky].trim() + "\n");
+	});
+	lines.push("\n");
+
+	if (msg !== undefined) {
+		lines.push(" " + msg + "\n");
+	}
+
+	if (this.copyright !== undefined) {
+		lines.push(" " + this.copyright + "\n");
+	}
+	return lines.join("");
+};
+
 
 // optionWith the options provided. It does not alter process.argv
 // @param argv {object} usually process.argv
-// @return {object} or {boolean} return true if succesful or the modified argv is consumable is used.
+// @return {object} or {boolean} return true if successful or the modified argv is consumable is used.
 var optionWith = function (argv) {
 	var self = this, i = 0, output_argv = [], parts;
 
@@ -124,64 +156,37 @@ var optionHelp = function (heading, synopsis, options, copyright) {
 // @param msg {string} optional message to include in the usage text rendered
 // @param error_level {number} an integer, 0 is no error, greater then zero is an OS level error level.
 var usage = function (msg, error_level) {
-	var self = this, ky;
+	var self = this, ky, print = console.log;
 
 	if (error_level === undefined || error_level === 0) {
-		if (this.heading) {
-			console.log(" " + this.heading.trim() + "\n");
-		}
-	
-		if (this.synopsis) {
-			console.log(" " + this.synopsis.trim() + "\n");
-		}
-	
-		if (this.options) {
-			console.log(" " + this.options.trim() + "\n");
-		}
-
-		Object.keys(this.option_messages).forEach(function (ky) {
-			console.log("\t" + ky + "\t\t" + self.option_messages[ky].trim() + "\n");
-		});
-
-		if (msg !== undefined) {
-			console.log(" " + msg + "\n");
-		}
-	
-		if (this.copyright) {
-			console.log(" " + this.copyright.trim() + "\n");
-		}
-	} else {
-		if (this.heading) {
-			console.error(" " + this.heading.trim() + "\n");
-		}
-	
-		if (this.synopsis) {
-			console.error(" " + this.synopsis.trim() + "\n");
-		}
-	
-		if (this.options) {
-			console.error(" " + this.options.trim() + "\n");
-		}
-
-		if (msg !== undefined) {
-			console.error(" " + msg + "\n");
-		} else {
-			console.error("ERROR: process exited with an error " + error_level);
-		}
-
-		Object.keys(self.option_messages).forEach(function (ky) {
-			console.error("\t" + ky + "\t\t" + self.option_messages[ky]);
-		});
-		console.log("\n");
-		if (msg !== undefined) {
-			console.error(" " + msg + "\n");
-		}
-		if (this.copyright) {
-			console.error(" " + this.copyright.trim() + "\n");
-		}
-	}
-	if (error_level === undefined) {
 		error_level = 0;
+		println = console.log;
+	} else {
+		println = console.error;	
+	}
+
+	if (this.heading) {
+		println(" " + this.heading + "\n");
+	}
+
+	if (this.synopsis) {
+		println(" " + this.synopsis + "\n");
+	}
+
+	if (this.options) {
+		println(" " + this.options + "\n");
+	}
+
+	Object.keys(this.option_messages).forEach(function (ky) {
+		println("\t" + ky + "\t\t" + self.option_messages[ky].trim() + "\n");
+	});
+
+	if (msg !== undefined) {
+		println(" " + msg + "\n");
+	}
+
+	if (this.copyright) {
+		println(" " + this.copyright + "\n");
 	}
 	process.exit(error_level);
 };
@@ -354,11 +359,11 @@ var restWith = function (request, response) {
 		matching = request.url.match(method[i].re);
 		if (matching !== null) {
 			// Process and trigger event or make callback.
-		if (method[i].callback !== false) {
+			if (method[i].callback !== false) {
 				method[i].callback(request, response, matching, i);
-		} else if (method[i].event_name !== false) {
-			this.emit(method[i].event_name, {request: request, response: response, matching: matching, rule_no: i});
-		}
+			} else if (method[i].event_name !== false) {
+				this.emit(method[i].event_name, {request: request, response: response, matching: matching, rule_no: i});
+			}
 			re_found = true;
 		}
 	}
@@ -370,77 +375,65 @@ var restWith = function (request, response) {
 };
 	
 // unrest = Remove a RESTful rule from processing by restWith();
-// FIXME: need a method to dynamic remove rules if needed.
+// ENHANCEMENT: need a method to dynamic remove rules if needed.
 
-// restHelp - generate documentation on the API run by restWith().
-// @param target {string} either "text", "markdown" or "html". If "html" then 
-// render using github-markdown-flavor module.
+// restHelp - generate documentation on the API invoked by restWith().
 // @return {string}
-var restHelp = function (target) {
-	switch (target) {
-	case 'html':
-		return "html Not Implemented Yet!";
-	case 'markdown':
-		return "markdown Not Implemented Yet!";
-	default:
-		return "plain text Not Implemented Yet!";
-	}
+var restHelp = function () {
+	return this.helpText();
 };
 
 // A constructor to created an EventEmitter
 // version of opt. 
 // @constructor
 // @return {object} a new instance of the Opt object
-var create = function () {
-	var Opt = function () {
-		this.opts = {};
-		this.option_messages = {};
-		this.restful = {};
-		this.restful_messages = {};
-		this.consumable = [];
-		this.heading = false;
-		this.synopsis = false;
-		this.options = false;
-		this.copyright = false;
-		this.consumable = [];
-
-		this.option = option;
-		this.optionWith = optionWith;
-		this.optionHelp = optionHelp;
-		this.consume = consume;
-
-		this.usage = usage;
-		this.configSync = configSync;
-		this.config = config;
-		this.rest = rest;
-		this.restWith = restWith;
-		this.restHelp = restHelp;
-						
-		this.set = option; // set() is depreciated in favaor of option()
-		this.parse = optionWith; // parse() is depreciated in favor of optionWith();
-		this.setup = optionHelp; // setup() is depcreciated in favor of setopHelp();
-
-		events.EventEmitter.call(this);
-	};
-	util.inherits(Opt, events.EventEmitter);
+var Opt = function () {
+	this.opts = {};
+	this.option_messages = {};
+	this.restful = {};
+	this.restful_messages = {};
+	this.consumable = [];
+	this.heading = false;
+	this.synopsis = false;
+	this.options = false;
+	this.copyright = false;
+	this.consumable = [];
 	
+	events.EventEmitter.call(this);
+};
+util.inherits(Opt, events.EventEmitter);
+
+Opt.prototype.consume = consume;
+Opt.prototype.usage = usage;
+Opt.prototype.helpText = helpText;
+Opt.prototype.configSync = configSync;
+Opt.prototype.config = config;
+	
+Opt.prototype.option = option;
+Opt.prototype.optionWith = optionWith;
+Opt.prototype.optionHelp = optionHelp;
+
+Opt.prototype.rest = rest;
+Opt.prototype.restWith = restWith;
+Opt.prototype.restHelp = restHelp;
+
+var create = function () {
 	return new Opt();
 };
 
+exports.Opt = Opt;
 exports.create = create;
-exports.option = option;
-exports.optionWith = optionWith;
-exports.optionHelp = optionHelp;
-exports.rest = rest;
-exports.restWith = restWith;
-exports.restHelp = restHelp;
+exports.helpText = helpText;
 exports.consume = consume;
-
 exports.usage = usage;
 exports.configSync = configSync;
 exports.config = config;
 
-exports.set = option; // set() is depreciated in favor of option()
-exports.parse = optionWith; // parse() is depreciated in favor of optionWith()
-exports.setup = optionHelp; // setup() is depreciated in favor of optionHelp()
+exports.option = option;
+exports.optionWith = optionWith;
+exports.optionHelp = optionHelp;
+
+exports.rest = rest;
+exports.restWith = restWith;
+exports.restHelp = restHelp;
 

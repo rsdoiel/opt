@@ -6,7 +6,7 @@
 // Released under New the BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-/*jslint node: true */
+/*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
 "use strict";
 
 var fs = require("fs"),
@@ -36,6 +36,10 @@ opt.option(["-o", "--output"], function (param) {
     output = param;
 }, "Set the name of the JSON file to read.");
 opt.optionWith(process.argv);
+
+if (input === "") {
+    opt.usage("\n\tTry --help", 1);
+}
 
 fields = JSON.parse(fs.readFileSync(input).toString());
 buf = [
