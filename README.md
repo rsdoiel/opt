@@ -188,3 +188,70 @@ Display a help message with -h and --help on the command line.
 		console.log("Web server listening on " + config.host + ":" + config.port);
 	});
 ```
+
+
+# Simple webserve example
+
+This example sets up a simple hello web server.
+
+```JavaScript
+	var fs = require("fs"),
+		path = require("path"),
+		http = require("http"),
+		url = require("url"),
+		opt = require("opt").create(),
+		TBone = require("tbone"),
+		H = new TBone.HTML(),
+		config_filename = false,
+		config = {
+			port: 8123,
+			host: "localhost"
+		};
+	
+	opt.optionHelp(
+		"USAGE node " + path.basename(process.argv[1]),
+		"SYNOPSIS: Demonstrate how opt works to parse command line options.\n" +
+		"\n\t\t node " + path.basename(process.argv[1]) + " --help",
+		"OPTIONS:",
+		"ACME Gelatin Company"
+	);
+	
+	opt.consume(true);
+	opt.option(["-p", "--port"], function (arg) {
+		try {
+			config.port = Number(arg);
+		} catch (err0) {
+			console.error(err0);
+			process.exit(1);
+		}
+		opt.consume(arg);
+	}, "Set the port to listen on.");
+	
+	opt.option(["-c", "--config"], function (arg) {
+		config_filename = arg;
+		option.consume(arg);
+	}, "Set the configuration file to use.");
+	
+	opt.option(["-h", "--help"], function (arg) {
+		opt.usage();
+	}, "This help page.");
+	
+	opt.optionWith(process.argv);
+	
+	if (config_filename) {
+		config = JSON.parse(fs.readFileSync(config_filename).toString());
+	}
+	
+	http.createServer(function (request, response) {
+		console.log("request:", request.url);
+		response.writeHead(200, "text/html");
+		response.end(H.html(
+			H.head(
+				H.title("Hello World")
+			),
+			H.body(
+				H.h1("Hello World")
+			)
+		).attr({lang: "en"}));
+	}).listen(config.port);
+```
