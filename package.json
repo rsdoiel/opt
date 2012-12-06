@@ -1,6 +1,6 @@
 {
 	"name" : "opt",
-	"version" : "0.1.11",
+	"version" : "0.1.12",
 	"description" : "A configuration, cmd line options and RESTful web processor module for NodeJS. A simple help text is also automatically generated based if the command line options or RESTful paths you define so you don't have to remember to do that later.",
 	"main" : "./opt.js",
 	"repository" : {
@@ -17,7 +17,7 @@
 		"url" : "https://github.com/rsdoiel"
 	}],
 	"engines" : {
-		"node" : ">= 0.7.12",
+		"node" : ">= 0.8.15",
 		"npm" : ">= 1.1.30"
 	},
 	"dependencies" : {
