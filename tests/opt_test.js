@@ -280,6 +280,53 @@ harness.push({callback: function (test_label) {
     harness.completed(test_label);
 }, label: "configEventsAndOptions"});
 
+harness.push({callback: function (test_label) {
+	var opt = OPT.create(),
+		argv = [];
+	
+	argv = [
+			'node',
+			'/usr/local/bin/test.js',
+			'-q',
+			'-m',
+			'2012-12-01 01:01:01'
+	];
+	opt.consume(true);
+	opt.option(["-m", "--modified"], function (param) {
+		assert.equal("2012-12-01 01:01:01", param, "Param should be '2012-12-01 01:01:01': " + param);
+	});
+	opt.optionWith(argv);
+
+	opt = OPT.create();
+	argv = [
+		'/usr/local/bin/node',
+		'/Users/rsdoiel/NoBackup/git-repos/news-search/wp-sync.js',
+		'-q',
+		'--modified=2012-12-06 06:00:00'
+  	];
+	opt.consume(true);
+	opt.option(["-m", "--modified"], function (param) {
+		assert.equal("2012-12-06 06:00:00", param, "Param should be '2012-12-06 06:00:00': " + param);
+	});
+	opt.optionWith(argv);
+
+	opt = OPT.create();
+	argv = [
+		'/usr/local/bin/node',
+		'/Users/rsdoiel/NoBackup/git-repos/news-search/wp-sync.js',
+		'-q',
+		'-m',
+		'"2012-12-06',
+		'06:00:00"'
+	];
+	opt.consume(true);
+	opt.option(["-m", "--modified"], function (param) {
+		assert.equal("2012-12-06 06:00:00", param, "Param should be '2012-12-06 06:00:00': " + param);
+	});
+	opt.optionWith(argv);
+	harness.completed(test_label);
+}, label: "Broken quoted string parameter handling bug when invoked from bash version 3.2.48"});
+
 if (require.main === module) {
     harness.RunIt(path.basename(module.filename), 10);
 } else {
