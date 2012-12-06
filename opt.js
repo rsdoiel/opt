@@ -156,13 +156,13 @@ var optionHelp = function (heading, synopsis, options, copyright) {
 // @param msg {string} optional message to include in the usage text rendered
 // @param error_level {number} an integer, 0 is no error, greater then zero is an OS level error level.
 var usage = function (msg, error_level) {
-	var self = this, ky, print = console.log;
+	var self = this, ky, println = console.log;
 
 	if (error_level === undefined || error_level === 0) {
 		error_level = 0;
 		println = console.log;
 	} else {
-		println = console.error;	
+		println = console.error;
 	}
 
 	if (this.heading) {
