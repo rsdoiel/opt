@@ -66,15 +66,15 @@ var helpText = function (msg) {
 	var self = this,
 		lines = [];
 	
-	if (this.heading !== undefined) {
+	if (this.helpOptions.heading !== undefined) {
 		lines.push(" " + self.heading + "\n");
 	}
 
-	if (this.synopsis !== undefined) {
+	if (this.helpOptions.synopsis !== undefined) {
 		lines.push(" " + self.synopsis + "\n");
 	}
 
-	if (this.options !== undefined) {
+	if (this.helpOptions.options !== undefined) {
 		lines.push(" " + self.options + "\n");
 	}
 
@@ -87,7 +87,7 @@ var helpText = function (msg) {
 		lines.push(" " + msg + "\n");
 	}
 
-	if (this.copyright !== undefined) {
+	if (this.helpOptions.copyright !== undefined) {
 		lines.push(" " + this.copyright + "\n");
 	}
 	return lines.join("");
@@ -140,11 +140,7 @@ var optionWith = function (argv, sanity_function) {
 
 
 // setup how opt with build the basic command line text description.
-// @param 
-// @param heading {string} The heading block as text
-// @param synopsis {string} The synopsis block as text
-// @param options {string} The prefix to the options block as text.
-// @param copyright {string} The copyright or credits block as text.
+// @param blocks - An object with help properties (e.g. heading, sysnopsis, options and copyright)
 var optionHelp = function (blocks) {
 	var self = this;
 	if (typeof blocks === "object") {
@@ -170,15 +166,15 @@ var usage = function (msg, error_level) {
 	}
 
 	if (this.helpOptions.heading) {
-		println(" " + this.heading + "\n");
+		println(" " + this.helpOptions.heading + "\n");
 	}
 
 	if (this.helpOptions.synopsis) {
-		println(" " + this.synopsis + "\n");
+		println(" " + this.helpOptions.synopsis + "\n");
 	}
 
 	if (this.helpOptions.options) {
-		println(" " + this.options + "\n");
+		println(" " + this.helpOptions.options + "\n");
 	}
 
 	Object.keys(this.option_messages).forEach(function (ky) {
@@ -189,7 +185,7 @@ var usage = function (msg, error_level) {
 		println(" " + msg + "\n");
 	}
 
-	if (this.copyright) {
+	if (this.helpOptions.copyright) {
 		println(" " + this.helpOptions.copyright + "\n");
 	}
 	
@@ -413,13 +409,15 @@ var restHelp = function () {
 // @constructor
 // @return {object} a new instance of the Opt object
 var Opt = function () {
+	var usage_string = "USAGE: node " + path.basename(require.main.filename) + " --help";
+
 	this.opts = {};
 	this.option_messages = {};
 	this.restful = {};
 	this.restful_messages = {};
 	this.consumable = [];
 	this.helpOptions = {
-		heading: "USAGE: node " + path.basename(module.filename) + " --help",
+		heading: usage_string,
 		synopsis: false,
 		options: "OPTIONS",
 		copyright: false
