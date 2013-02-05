@@ -29,55 +29,58 @@ var fs = require("fs"),
 	config_filename = "";
 
 // Check a search path and pickup the first configuration file found
-config = opt.configSync(default_config, [
+opt.config(default_config, [
 	path.join(process.env.HOME, "fred.cnf"),
 	"/usr/etc/fred.cnf",
 	"/etc/fred.cnf"
 ]);
 
 // Setup some helpful command line info	
-opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
-		"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node " +
+opt.optionHelp({
+	heading: "USAGE node " + path.basename(process.argv[1]),
+	sysnopsis: "SYNOPSIS: Demonstrate how opt works.\n\n\t\t node " +
 				path.basename(process.argv[1]) + " --email",
-		"OPTIONS",
-		" copyright (c) 2012 all rights reserved\n" +
+	options: "OPTIONS",
+	copyright: " copyright (c) 2012 all rights reserved\n" +
 		" Released under New the BSD License.\n" +
-		" See: http://opensource.org/licenses/bsd-license.php\n");
-
-// Use a specific configuration file
-opt.option(["-c", "--config"], function (config_filename) {
-	if (config_filename) {
-		config = opt.configSync(default_config, [config_filename]);
-		opt.consume(config_filename);
-	}
-}, "Use a specific configuration file");
-
-// Optionally show Fred's email address
-opt.option(["-e", "--email"], function () {
-	config.show_email = true;
-}, "Show the email address.");
-
-opt.option(["-E", "--no-email"], function () {
-	config.show_email = false;
-}, "Don't show the email address.");
-
-// Generate and write a configuration file.
-opt.option(["-g", "--generate"], function (param) {
-	config_only = true;
-	if (param !== undefined && param.trim() !== "") {
-		config_filename = param.trim();
-	}
-	opt.consume(param);
-}, "Generate a configuration JSON expression. Optionally save it to a file.");
-
-opt.option(["-h", "--help"], function () {
-    opt.usage();
-}, "This help document.");
+		" See: http://opensource.org/licenses/bsd-license.php\n"
+});
 
 //
 // Now that everything is configured do what Fred wants.
 //
 opt.on("ready", function (config) {
+	// Use a specific configuration file
+	opt.option(["-c", "--config"], function (config_filename) {
+		if (config_filename) {
+			config = opt.configSync(default_config, [config_filename]);
+			opt.consume(config_filename);
+		}
+	}, "Use a specific configuration file");
+
+	// Optionally show Fred's email address
+	opt.option(["-e", "--email"], function () {
+		config.show_email = true;
+	}, "Show the email address.");
+
+	opt.option(["-E", "--no-email"], function () {
+		config.show_email = false;
+	}, "Don't show the email address.");
+
+	// Generate and write a configuration file.
+	opt.option(["-g", "--generate"], function (param) {
+		config_only = true;
+		if (param !== undefined && param.trim() !== "") {
+			config_filename = param.trim();
+		}
+		opt.consume(param);
+	}, "Generate a configuration JSON expression. Optionally save it to a file.");
+
+	opt.option(["-h", "--help"], function () {
+	    opt.usage();
+	}, "This help document.");
+
+
     // Process the command line arguments
     opt.optionWith(process.argv);
 

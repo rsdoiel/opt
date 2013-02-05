@@ -8,7 +8,7 @@
 // See: http://opensource.org/licenses/bsd-license.php
 //
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
-
+"use strict";
 var fs = require("fs"),
     path = require("path"),
     cluster = require("cluster"),
@@ -195,10 +195,12 @@ var childProcess = function (config) {
 };
 
 // Setup command line arg processing
-opt.optionHelp("USAGE node md-server.js" + path.basename(process.argv[1]),
-	"SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n ",
-	"OPTIONS",
-	"Copyright notice would go here.");
+opt.optionHelp({
+	heading: "USAGE node md-server.js" + path.basename(process.argv[1]),
+	sysnopsis: "SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n ",
+	options: "OPTIONS",
+	copyright: "Copyright notice would go here."
+});
 
 opt.option(["-t", "--threads"], function (param) {
 	if (Number(param).toFixed(0) > 2) {
@@ -253,18 +255,20 @@ opt.option(['-h', '--help'], function () {
 }, "This help document.");
 
 // Process the command line arguments
-opt.optionWith(process.argv);
+opt.optionWith(process.argv, function (args) {
+	if (!config.docs) {
+		opt.usage("You must set a document root. Try --documents", 1);
+	}
+	if (!config.port) {
+		opt.usage("You must set a port number listen on. Try --port", 1);
+	}
+	// return true if everything is OK
+	return true;
+});
 
 //
 // Main
 //
-if (!config.docs) {
-	opt.usage("You must set a document root. Try --documents", 1);
-}
-if (!config.port) {
-	opt.usage("You must set a port number listen on. Try --port", 1);
-}
-
 // Launch the web server
 if (cluster.isMaster === true) {
 	parentProcess(config);

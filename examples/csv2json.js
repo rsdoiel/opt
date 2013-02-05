@@ -18,15 +18,16 @@ var csv_filename = false,
     json_filename = false,
     args = [];
 
-opt.optionHelp("USAGE: node " + path.basename(process.argv[1]) + " [options] CSVFILE JSONFILE",
-        "SYNOPSIS: Read a CSV file, generate a stream of JSON blobs suitable\n" +
-        " into for dirty db or MongoDB.",
-        "OPTIONS:",
-        " by R. S. Doiel]\n" +
+opt.optionHelp({
+	heading: "USAGE: node " + path.basename(process.argv[1]) + " [options] CSVFILE JSONFILE",
+    synopsis: "SYNOPSIS: Read a CSV file, generate a stream of JSON blobs suitable\n" +
+    	" into for dirty db or MongoDB.",
+    options: "OPTIONS:",
+    copyright: " by R. S. Doiel]\n" +
         " copyright (c) 2012 all rights reserved\n" +
         " Released under New the BSD License.\n" +
         " See: http://opensource.org/licenses/bsd-license.php"
-    );
+});
 
 opt.option(["-i", "--input", "--csv"], function (param) {
     csv_filename = param;
@@ -41,26 +42,25 @@ opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help page.");
 
-args = opt.optionWith(process.argv);
-
-if (args === true &&
-	    csv_filename === false &&
-	    json_filename === false) {
-    opt.usage("\n\tTry --help", 1);
-}
-
-if (csv_filename === false && args.length > 2) {
-    csv_filename = args[2].trim();
-} else if (csv_filename === false) {
-    csv_filename = "-";
-}
-
-if (json_filename === false && args.length > 3) {
-    json_filename = args[3].trim();
-} else if (json_filename === false) {
-    json_filename = "-";
-}
-
+opt.optionWith(process.argv, function (args) {
+	if (args === true &&
+		    csv_filename === false &&
+		    json_filename === false) {
+	    opt.usage("\n\tTry --help", 1);
+	}
+	if (csv_filename === false && args.length > 2) {
+	    csv_filename = args[2].trim();
+	} else if (csv_filename === false) {
+	    csv_filename = "-";
+	}
+	if (json_filename === false && args.length > 3) {
+	    json_filename = args[3].trim();
+	} else if (json_filename === false) {
+	    json_filename = "-";
+	}
+	// Everything should be OK so return true.
+	return true;
+});
 
 // Main processing function
 (function (csv_filename, json_filename) {

@@ -2,7 +2,7 @@
 // Putting it all together.
 //
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
-
+"use strict";
 // Importing some modules
 var util = require("util"),
     http = require("http"),
@@ -19,10 +19,12 @@ opt.config({ host: "localhost", port: 8080, name: "John Doe"},
 // and setup your RESTful hello world web service
 opt.on("ready", function (config) {
     // Setup how your help page will look
-    opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
-        "SYNOPSIS:\n\tThis is a simple hello world web service.",
-        "OPTIONS:",
-        "this is an opt demo");
+    opt.optionHelp({
+    	heading: "USAGE node " + path.basename(process.argv[1]),
+        sysnopsis: "SYNOPSIS:\n\tThis is a simple hello world web service.",
+        options: "OPTIONS:",
+        copyright: "this is an opt demo"
+    });
 
     // Define your command line options
     opt.option(["-H", "--host"], function (hostname) {

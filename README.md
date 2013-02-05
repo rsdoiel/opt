@@ -102,12 +102,14 @@ Display a help message with -h and --help on the command line.
 	console.log("Unprocessed config:", config);
 	opt.config(config, search_paths);
 	
-	opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
-		"SYNOPSIS: Demonstrate how opt works to parse command line options.\n\n\t\t node " + path.basename(process.argv[1]) + " --help",
-		"OPTIONS:",
-		" copyright (c) 2012 all rights reserved\n" +
+	opt.optionHelp({
+		heading: "USAGE node " + path.basename(process.argv[1]),
+		sysnopsis: "SYNOPSIS: Demonstrate how opt works to parse command line options.\n\n\t\t node " + path.basename(process.argv[1]) + " --help",
+		options: "OPTIONS:",
+		copyright: " copyright (c) 2012 all rights reserved\n" +
 		" Released under New the BSD License.\n" +
-		" See: http://opensource.org/licenses/bsd-license.php\n");
+		" See: http://opensource.org/licenses/bsd-license.php\n"
+	});
 	
 	
 	opt.on("ready", function (config) {
@@ -164,10 +166,12 @@ Display a help message with -h and --help on the command line.
 	// and setup your RESTful hello world web service
 	opt.on("ready", function (config) {
 		// Setup how your help page will look
-		opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
-			"SYNOPSIS:\n\tThis is a simple hello world web service.",
-			"OPTIONS:",
-			"this is an opt demo");
+		opt.optionHelp({
+			heading: "USAGE node " + path.basename(process.argv[1]),
+			sysnopsis: "SYNOPSIS:\n\tThis is a simple hello world web service.",
+			options: "OPTIONS:",
+			copyright: "this is an opt demo"
+		});
 	
 		// Define your command line options
 		opt.option(["-H", "--host"], function (hostname) {
@@ -228,13 +232,13 @@ This example sets up a simple hello web server.
 			host: "localhost"
 		};
 	
-	opt.optionHelp(
-		"USAGE node " + path.basename(process.argv[1]),
-		"SYNOPSIS: Demonstrate how opt works to parse command line options.\n" +
-		"\n\t\t node " + path.basename(process.argv[1]) + " --help",
-		"OPTIONS:",
-		"ACME Gelatin Company"
-	);
+	opt.optionHelp({
+		heading: "USAGE node " + path.basename(process.argv[1]),
+		sysnopsis: "SYNOPSIS: Demonstrate how opt works to parse command line options.\n" +
+			"\n\t\t node " + path.basename(process.argv[1]) + " --help",
+		options: "OPTIONS:",
+		copyright: "ACME Gelatin Company"
+	});
 	
 	opt.consume(true);
 	opt.option(["-p", "--port"], function (arg) {

@@ -15,12 +15,15 @@ var util = require("util"),
 	config = {},
 	today = new Date();
 
-opt.optionHelp("USAGE:  node " + path.basename(process.argv[1]) + " --help",
-	"SYNOPSIS: demo a realistic example of using opt.\n\n\t\tnode " + path.basename(process.argv[1]) + "  --first-name=john \\ \n\t\t\t --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\"",
-	"OPTIONS:",
-	" copyright (c) 2011 all rights reserved\n" +
+opt.optionHelp({
+	heading: "USAGE:  node " + path.basename(process.argv[1]) + " --help",
+	sysnopsis: "SYNOPSIS: demo a realistic example of using opt.\n\n\t\tnode " + path.basename(process.argv[1]) + "  --first-name=john \\ \n\t\t\t --last-name=doe \\ \n\t\t\t--start=\"2011-01-01\" --end=\"now\"",
+	options: "OPTIONS:",
+	copyright: " copyright (c) 2011 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
-	" See: http://opensource.org/licenses/bsd-license.php\n");
+	" See: http://opensource.org/licenses/bsd-license.php\n"
+});
+
 opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help document.");
@@ -50,11 +53,12 @@ opt.option(["-e", "--end"], function (end_date) {
 }, "Set the last date for reporting.  Usually a date in YYYY-MM-DD format or \"now\".");
 
 // Parse the command line options
-if (process.argv.length < 3) {
-	console.log("Try using a command line option for demo:\n" + opt.usage());
-	process.exit(1);
-} else {
-	opt.optionWith(process.argv);
-}
+opt.optionWith(process.argv, function (argv) {
+	if (argv.length < 3) {
+		opt.usage("Try using a command line option for demo.", 1);
+	}
+	// Since we're OK, return true.
+	return true;
+});
 console.log("\nConfig object properties set by opt: ");
 console.log(util.inspect(config));

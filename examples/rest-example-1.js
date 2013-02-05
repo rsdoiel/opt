@@ -9,7 +9,7 @@
 // See: http://opensource.org/licenses/bsd-license.php
 //
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
-
+"use strict";
 var fs = require('fs'),
     path = require("path"),
     http = require('http'),
@@ -24,12 +24,14 @@ var config = { name: "fred", email: "fred@example.com", host: "localhost", port:
 
 opt.config(config, search_paths);
 
-opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
-	"SYNOPSIS: Demonstrate how opt works with web services.\n\n\t\t node " + path.basename(process.argv[1]) + " --help",
-	"OPTIONS:",
-	" copyright (c) 2012 all rights reserved\n" +
+opt.optionHelp({
+	heading: "USAGE node " + path.basename(process.argv[1]),
+	sysnopsis: "SYNOPSIS: Demonstrate how opt works with web services.\n\n\t\t node " + path.basename(process.argv[1]) + " --help",
+	options: "OPTIONS:",
+	copyright: " copyright (c) 2012 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
-	" See: http://opensource.org/licenses/bsd-license.php\n");
+	" See: http://opensource.org/licenses/bsd-license.php\n"
+});
 
 
 // Bind some paths to events.

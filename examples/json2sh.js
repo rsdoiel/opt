@@ -17,29 +17,34 @@ var fs = require("fs"),
     fields = {},
     buf;
 
-opt.optionHelp("USAGE: node " + path.basename(process.argv[1]) + " --input=JSON_FILENAME --output=BASH_FILENAME",
-    "SYNOPSIS: Report processsed urls in the database generate by " + path.basename(process.argv[1]) + ".\n",
-    "OPTIONS:",
-    " by R. S. Doiel\n" +
-    " copyright (c) 2012 all rights reserved\n" +
-    " Released under New the BSD License.\n" +
-    " See: http://opensource.org/licenses/bsd-license.php"
-	);
+opt.optionHelp({
+	heading: "USAGE: node " + path.basename(process.argv[1]) + " --input=JSON_FILENAME --output=BASH_FILENAME",
+    sysnopsis: "SYNOPSIS: Report processsed urls in the database generate by " + path.basename(process.argv[1]) + ".\n",
+    options: "OPTIONS:",
+    copyright: " by R. S. Doiel\n" +
+	    " copyright (c) 2012 all rights reserved\n" +
+	    " Released under New the BSD License.\n" +
+	    " See: http://opensource.org/licenses/bsd-license.php"
+});
 
 opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help page.");
+
 opt.option(["-i", "--input"], function (param) {
     input = param;
 }, "Set the name of the JSON file to read.");
+
 opt.option(["-o", "--output"], function (param) {
     output = param;
 }, "Set the name of the JSON file to read.");
-opt.optionWith(process.argv);
 
-if (input === "") {
-    opt.usage("\n\tTry --help", 1);
-}
+opt.optionWith(process.argv, function () {
+	if (input === "") {
+	    opt.usage("\n\tTry --help", 1);
+	}
+});
+
 
 fields = JSON.parse(fs.readFileSync(input).toString());
 buf = [

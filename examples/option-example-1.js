@@ -17,27 +17,33 @@ var util = require("util"),
 	message,
 	args;
 
-opt.optionHelp("USAGE node " + program_name,
-	"SYNOPSIS: Demonstrate how opt works.\n\n\t\t node " +
+opt.optionHelp({
+	heading: "USAGE node " + program_name,
+	synopsis: "SYNOPSIS: Demonstrate how opt works.\n\n\t\t node " +
 		program_name +
 		" --help",
-	"OPTIONS:",
-	" copyright (c) 2012 all rights reserved\n" +
+	options: "OPTIONS:",
+	copyright: "copyright (c) 2012 all rights reserved\n" +
 	" Released under New the BSD License.\n" +
-	" See: http://opensource.org/licenses/bsd-license.php\n");
+	" See: http://opensource.org/licenses/bsd-license.php\n"
+});
 
 opt.option(["-m", "--message"], function (param) {
 	message = param;
 	opt.consume(param);
 }, "message to display");
+
 opt.option(["-h", "--help"], function () {
     opt.usage();
 }, "This help document.");
 
 // Parse the command line options
-args = opt.optionWith(process.argv);
-if (message) {
-	console.log(message);
-} else {
-	opt.usage("Try using a command line option for demo:\n", 1);
-}
+var args = opt.optionWith(process.argv, function (argv) {
+	if (message) {
+		console.log(message);
+	} else {
+		opt.usage("Try using a command line option for demo.", 1);
+	}
+	// Since we're OK, return the argv left.
+	return argv;
+});
