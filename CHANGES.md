@@ -1,6 +1,14 @@
 opt changes
 ===========
 
+# version 0.2.x
+
+Going from 0.1.x to 0.2.x is a major change.  Some are caused by additional features some by simplifying use based on practice.
+
+Major changes involve optionsHelp() (now configured by an object), routes in rest() method are now an object. Templating via
+Handlebars is now supported for both the command line help and RESTful docs auto-generated via /help.
+
+
 # version 0.0.7 to 0.0.8
 
 This following functions have been depreciated.
@@ -8,6 +16,7 @@ This following functions have been depreciated.
 * opt.set(...) has been depreciated in favor of opt.option(...)
 * opt.parse(...) has been depreciated in favor of opt.optionWith(...)
 * opt.setup(...) has been depreciated in favor of opt.optionHelp(...)
+
 
 This following functions have been added.
 
@@ -19,6 +28,7 @@ This following functions have been added.
 The following were removed.
 
 * opt.help() - There are separate help message trees for command line options and restful options
+
 
 # version 0.0.6 to 0.0.7
 

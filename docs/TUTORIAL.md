@@ -26,7 +26,7 @@ This is the synchronous version.
 	// Demo a simple configuration processing
 	//
 	/*jslint node:true */
-	
+	"use static";
 	var path = require("path"),
 		opt = require("../opt").create();
 	
@@ -278,38 +278,49 @@ Display a help message with -h and --help on the command line.
 		collection_name = false,
 		new_args = [];
 	
-	opt.setup("USAGE: node " + path.basename(process.argv[1]) + " [options] input_name output_name",
-			"SYNOPSIS: Show how you can make a simple command line program using consumable args.",
-			"OPTIONS:",
+	opt.optionHelp({
+		heading: "USAGE: node " + path.basename(process.argv[1]) + " [options] input_name output_name",
+		sysnopsis: "SYNOPSIS: Show how you can make a simple command line program using consumable args.",
+		options: "OPTIONS:",
 			" Example Organization Name here\n" +
-			" Some copyright statement here.");
+			" Some copyright statement here."
+	});
 	
 	opt.consume(true);// Turn on argument consumption
-	opt.set(["-d", "--database"], function (param) {
+	opt.option(["-d", "--database"], function (param) {
 		database_name = param;
 		opt.consume(param);
 	}, "Set the database name.");
-	opt.set(["-c", "--collection"], function (param) {
+	opt.option(["-c", "--collection"], function (param) {
 		collection_name = param;
 		opt.consume(param);
 	}, "Set the collection name.");
-	opt.set(["-i", "--input"], function (param) {
+	opt.option(["-i", "--input"], function (param) {
 		input_name = param;
 		opt.consume(param);
 	});
-	opt.set(["-o", "--output"], function (param) {
+	opt.option(["-o", "--output"], function (param) {
 	}, "Set the output name.");
-	opt.set(["-h", "--help"], function () {
+	opt.option(["-h", "--help"], function () {
 		opt.usage();
 	}, "This help page.");
 	
-	new_args = opt.parse(process.argv);
-	if (new_args[1] !== undefined) {
-		input_name = new_args[1];
-	}
-	if (new_args[2] !== undefined) {
-		output_name = new_args[2];
-	}
+	new_args = opt.optionWith(process.argv, function (argv) {
+		if (argv[1] !== undefined) {
+			input_name = new_args[1];
+		}
+		if (argv[2] !== undefined) {
+			output_name = argv[2];
+		}
+		if (!input_name) {
+			opt.usage("Missing an input source.", 1);
+		}
+		if (!output_name) {
+			opt.usage("Missing output destination.", 1);
+		}
+		// We're ok so pass back the remaining argv.
+		return argv;
+	});
 	console.log("New args: " + util.inspect(new_args));
 	console.log("Input name:", input_name);
 	console.log("Output name:", output_name);
@@ -337,12 +348,14 @@ This is a simple web server demonstrating how to define action for a given path 
 	
 	opt.config(config, search_paths);
 	
-	opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
-		"SYNOPSIS: Demonstrate how opt works with web services.\n\n\t\t node " + path.basename(process.argv[1]) + " --help",
-		"OPTIONS:",
-		" copyright (c) 2012 all rights reserved\n" +
-		" Released under New the BSD License.\n" +
-		" See: http://opensource.org/licenses/bsd-license.php\n");
+	opt.optionHelp({
+		heading: "USAGE node " + path.basename(process.argv[1]),
+		sysnopsis: "SYNOPSIS: Demonstrate how opt works with web services.\n\n\t\t node " + path.basename(process.argv[1]) + " --help",
+		options: "OPTIONS:",
+		copyright: "copyright (c) 2012 all rights reserved\n" +
+			" Released under New the BSD License.\n" +
+			" See: http://opensource.org/licenses/bsd-license.php\n"
+	});
 	
 	
 	// Bind some paths to events.
@@ -418,7 +431,16 @@ This is a simple web server demonstrating how to define action for a given path 
 			opt.usage("", 0);
 		}, "This help document.");
 	
-		opt.optionWith(process.argv);
+		opt.optionWith(process.argv, function (argv) {
+			if (!config.host) {
+				opt.usage("Missing hostname", 1);
+			}
+			if (!config.port || !Number(config.port)) {
+				opt.usage("Missing a port number", 1)
+			}
+			// We're ok so just pass back true.
+			return true;
+		});
 	
 		console.log("Starting web server", config.host + ":" + config.port);
 		http.createServer(function (request, response) {

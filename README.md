@@ -78,6 +78,9 @@ This is the synchronous version.
 		// from default_config and the first configuration file 
 		// found in the search path list.
 		console.log("Processed config: ", config);
+		
+		// Now you can define your command line options and use optionWith()
+		// to modify the configuration read.
 	});
 ```
 
@@ -102,17 +105,16 @@ Display a help message with -h and --help on the command line.
 	console.log("Unprocessed config:", config);
 	opt.config(config, search_paths);
 	
-	opt.optionHelp({
-		heading: "USAGE node " + path.basename(process.argv[1]),
-		sysnopsis: "SYNOPSIS: Demonstrate how opt works to parse command line options.\n\n\t\t node " + path.basename(process.argv[1]) + " --help",
-		options: "OPTIONS:",
-		copyright: " copyright (c) 2012 all rights reserved\n" +
-		" Released under New the BSD License.\n" +
-		" See: http://opensource.org/licenses/bsd-license.php\n"
-	});
-	
-	
 	opt.on("ready", function (config) {
+		opt.optionHelp({
+			heading: "USAGE node " + path.basename(process.argv[1]),
+			sysnopsis: "SYNOPSIS: Demonstrate how opt works to parse command line options.\n\n\t\t node " + path.basename(process.argv[1]) + " --help",
+			options: "OPTIONS:",
+			copyright: " copyright (c) 2012 all rights reserved\n" +
+			" Released under New the BSD License.\n" +
+			" See: http://opensource.org/licenses/bsd-license.php\n"
+		});
+			
 		opt.option(["-n", "--name"], function (param) {
 			if (param.trim()) {
 				config.name = param.trim();
@@ -260,11 +262,16 @@ This example sets up a simple hello web server.
 		opt.usage();
 	}, "This help page.");
 	
-	opt.optionWith(process.argv);
-	
-	if (config_filename) {
-		config = JSON.parse(fs.readFileSync(config_filename).toString());
-	}
+	opt.optionWith(process.argv, function (argv) {
+		if (config_filename) {
+			config = JSON.parse(fs.readFileSync(config_filename).toString());
+		}
+		// Do a sanity check here to make sure the minimal fields are expected
+		if (!config.port || !Number(config.port)) {
+			opt.usage("Missing a port number to listen to.", 1);
+		}
+		return true;
+	});
 	
 	http.createServer(function (request, response) {
 		console.log("request:", request.url);
