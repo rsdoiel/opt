@@ -8,6 +8,8 @@ Things to fix
 * restHelp() - needs to set a default route of /help
 * rest() - should allow defining a route by both pathname and mime type accepted (e.g. /api/thing for mime-type application/json)
 * If opt is called from with in YUI then use Y.log() instead of console.log()
+* Switch with to a configuration object for rest(), option(), optionsHelp(), restHelp()
+* Consider a dependancy on YUI if that is what I'm going to be pairing this with regularly
 
 
 # Version 0.0.9

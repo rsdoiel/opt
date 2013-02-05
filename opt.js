@@ -1,16 +1,19 @@
 //
 // opt.js - a very simple command line option parser and RESTful parse for NodeJS projects.
 // @author: R. S. Doiel, <rsdoiel@gmail.com>
-// copyright (c) 2011 all rights reserved
+//
+// copyright (c) 2011-2013 R. S. Doiel
+// All rights reserved.
 //
 // Released under the Simplified BSD License.
 // See: http://opensource.org/licenses/bsd-license.php
 //
-// revision: 0.0.10
+// revision: v0.2.0-pre
 //
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
-
+"use strict";
 var fs = require("fs"),
+	path = require("path"),
 	events = require("events"),
 	util = require("util"),
 	url = require("url"),
@@ -93,8 +96,9 @@ var helpText = function (msg) {
 
 // optionWith the options provided. It does not alter process.argv
 // @param argv {object} usually process.argv
+// @param sanity_function {function} if true, command line is complete, false something is wrong.
 // @return {object} or {boolean} return true if successful or the modified argv is consumable is used.
-var optionWith = function (argv) {
+var optionWith = function (argv, sanity_function) {
 	var self = this, i = 0, output_argv = [], parts;
 
 	if (argv === undefined) {
@@ -127,26 +131,26 @@ var optionWith = function (argv) {
 		});
 		return output_argv;
 	}
+	
+	if (typeof sanity_function === "function") {
+		return sanity_function();
+	}
 	return true;
 };
 
 
 // setup how opt with build the basic command line text description.
+// @param 
 // @param heading {string} The heading block as text
 // @param synopsis {string} The synopsis block as text
 // @param options {string} The prefix to the options block as text.
 // @param copyright {string} The copyright or credits block as text.
-var optionHelp = function (heading, synopsis, options, copyright) {
-	// Now apply the options
-	this.heading = heading;
-	if (synopsis !== undefined) {
-		this.synopsis = synopsis;
-	}
-	if (options !== undefined) {
-		this.options = options;
-	}
-	if (copyright !== undefined) {
-		this.copyright = copyright;
+var optionHelp = function (blocks) {
+	var self = this;
+	if (typeof blocks === "object") {
+		Object.keys(blocks).forEach(function (ky) {
+			self.helpOptions[ky] = blocks[ky];
+		});
 	}
 	return true;
 };
@@ -157,7 +161,7 @@ var optionHelp = function (heading, synopsis, options, copyright) {
 // @param error_level {number} an integer, 0 is no error, greater then zero is an OS level error level.
 var usage = function (msg, error_level) {
 	var self = this, ky, println = console.log;
-
+	
 	if (error_level === undefined || error_level === 0) {
 		error_level = 0;
 		println = console.log;
@@ -165,15 +169,15 @@ var usage = function (msg, error_level) {
 		println = console.error;
 	}
 
-	if (this.heading) {
+	if (this.helpOptions.heading) {
 		println(" " + this.heading + "\n");
 	}
 
-	if (this.synopsis) {
+	if (this.helpOptions.synopsis) {
 		println(" " + this.synopsis + "\n");
 	}
 
-	if (this.options) {
+	if (this.helpOptions.options) {
 		println(" " + this.options + "\n");
 	}
 
@@ -186,8 +190,9 @@ var usage = function (msg, error_level) {
 	}
 
 	if (this.copyright) {
-		println(" " + this.copyright + "\n");
+		println(" " + this.helpOptions.copyright + "\n");
 	}
+	
 	process.exit(error_level);
 };
 
@@ -305,26 +310,44 @@ var config = function (default_config, search_paths, callback) {
 
 
 // rest - define a restful interaction
-// @param method {string} this type of method being defined (e.g. GET, POST, DELETE, PUT)
-// @param path_expression {RegExp} a regular expression expression describing the RESTful path
+// @param route - A route is an object with method, pathname and mime_type properties. The
+// default route would look like {method: "GET", pathname: "*", mime_type: "*/*"}. The
+// method property should be GET, POST, DELETE or PUT. The pathname property can be an
+// explicit path (e.g. /index.html) or a RegExp. The mime_type property should reflect the
+// expected mime_type made by the request (e.g. text/html, application/javascript being the most common).
+// Example routes:
+//    // route for an index.html file
+//    {method: "GET", pathname: "/index.html", mime_type: "text/html"}
+//    // route for a JSON Response for /api/posts
+//    {method: "GET", pathname: "/api/posts", mime_type: "application/javascript"}
+//    // route for an HTML response for /api/posts
+//    {method: "GET", pathname: "/api/posts", mime_type: "text/html"}
+//
 // @param callback_or_event_name {function|string} the function to respond to the http request with.
 // @param help_message - short documentation string for RESTful help page.
 // @return {object} containing the method type and rule number in that method list.
-var rest = function (method, path_expression, callback_or_event_name, help_message) {
+var rest = function (route, callback_or_event_name, help_message) {
 	var re, callback = false, event_name = false, rule_no;
+	
+	if (route.method === undefined) {
+		route.method = "GET";
+	}
+	if (route.mime_type === undefined) {
+		route.mime_type = "*/*";
+	}
 	
 	if (typeof path_expression === "string") {
 		try {
-			re = new RegExp(path_expression);
+			re = new RegExp(route.pathname);
 		} catch (err) {
-			console.error(path_expression, err);
+			console.error(route.pathname, err);
 		}
 	} else {
-		re = path_expression;
+		re = route.pathname;
 	}
 	// defined the method list if not previously defined
-	if (this.restful[method.toLowerCase()] === undefined) {
-		this.restful[method.toLowerCase()] = [];
+	if (this.restful[route.method.toLowerCase()] === undefined) {
+		this.restful[route.method.toLowerCase()] = [];
 	}
 	
 	if (typeof callback_or_event_name === "function") {
@@ -333,13 +356,15 @@ var rest = function (method, path_expression, callback_or_event_name, help_messa
 		event_name = callback_or_event_name;
 	}
 	// Now add the RegExp, etc. to the method list
-	this.restful[method].push({
+	// FIXME: Need to support filtering on a combination of pathname AND mime type
+	this.restful[route.method].push({
+		mime_type: route.mime_type,
 		re: re,
 		callback: callback,
 		event_name: event_name
 	});
-	rule_no = this.restful[method].length - 1;
-	return {method: method, rule_no: rule_no};
+	rule_no = this.restful[route.method].length - 1;
+	return {method: route.method, rule_no: rule_no};
 };
 
 // restWith - process the request and response provided by http.server() against the rest interactions defined.
@@ -393,10 +418,18 @@ var Opt = function () {
 	this.restful = {};
 	this.restful_messages = {};
 	this.consumable = [];
-	this.heading = false;
-	this.synopsis = false;
-	this.options = false;
-	this.copyright = false;
+	this.helpOptions = {
+		heading: "USAGE: node " + path.basename(module.filename) + " --help",
+		synopsis: false,
+		options: "OPTIONS",
+		copyright: false
+	};
+	this.helpRest = {
+		heading: false,
+		synopsis: false,
+		routes: false,
+		copyright: false
+	};
 	this.consumable = [];
 	
 	events.EventEmitter.call(this);

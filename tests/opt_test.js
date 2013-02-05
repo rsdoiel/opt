@@ -11,6 +11,7 @@
 //
 
 /*jslint devel: true, node: true, maxerr: 50, indent: 4,  vars: true, sloppy: true */
+"use strict";
 
 var fs = require("fs"),
     path = require("path"),
@@ -223,14 +224,16 @@ harness.push({callback: function (test_label) {
 	var opt = OPT.create(), msg;
 	
 	// Setup command line arg processing
-	opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
-		"SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n ",
-		"OPTIONS",
-		"Copyright notice would go here.");
-	assert.ok(opt.heading, "Should have a page heading now");
-	assert.ok(opt.synopsis, "Should have a synopsis section now");
-	assert.ok(opt.options, "Should have a options heading now");
-	assert.ok(opt.copyright, "Should have copyright set now.");
+	opt.optionHelp({
+		heading: "USAGE node " + path.basename(process.argv[1]),
+		synopsis: "SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n ",
+		options: "OPTIONS",
+		copyright: "Copyright notice would go here."
+	});
+	assert.ok(opt.helpOptions.heading, "Should have a page heading now");
+	assert.ok(opt.helpOptions.synopsis, "Should have a synopsis section now");
+	assert.ok(opt.helpOptions.options, "Should have a options heading now");
+	assert.ok(opt.helpOptions.copyright, "Should have copyright set now.");
 	
 	opt.option(["-h", "--help"], function (param) {
 		console.log("defined help.");
@@ -257,21 +260,30 @@ harness.push({callback: function (test_label) {
     opt.config({}, ["examples/config-example-1.conf"]);
     opt.on("ready", function (config) {
 	// Setup command line arg processing
-		opt.optionHelp("USAGE node " + path.basename(process.argv[1]),
-			"SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n ",
-			"OPTIONS",
-			"Copyright notice would go here.");
-		assert.ok(opt.heading, "Should have a page heading now");
-		assert.ok(opt.synopsis, "Should have a synopsis section now");
-		assert.ok(opt.options, "Should have a options heading now");
-		assert.ok(opt.copyright, "Should have copyright set now.");
+		opt.optionHelp({
+			heading: "USAGE node " + path.basename(process.argv[1]),
+			synopsis: "SYNOPSIS:\n\tdemo of using opt and cluster module together\n\n ",
+			options: "OPTIONS",
+			copyright: "Copyright notice would go here."
+		});
+		assert.ok(opt.helpOptions.heading, "Should have a page heading now");
+		assert.ok(opt.helpOptions.synopsis, "Should have a synopsis section now");
+		assert.ok(opt.helpOptions.options, "Should have a options heading now");
+		assert.ok(opt.helpOptions.copyright, "Should have copyright set now.");
 		
 		opt.option(["-T"], function (param) {
 			assert.equal(param, "'hello world'", "Should have param set to 'hello world'" + util.inspect(param));
 			config.help = param;
 		});
 
-		opt.optionWith(["-T", "'hello world'"]);
+		var called_sanity_check = false, sanity_result = false;
+		sanity_result = opt.optionWith(["-T", "'hello world'"], function () {
+			// Always return true, we're always sane ;-)
+			called_sanity_check = true;
+			return true;
+		});
+		assert.ok(called_sanity_check, "Should have called the sanity check function");
+		assert.strictEqual(sanity_result, true, "Should get a true sanity result.");
         assert.equal(config.greetings, "Hello",
 			"Should have a args.greetings of hello" + util.inspect(config));
         assert.equal(config.help, "'hello world'",
@@ -345,7 +357,3 @@ if (require.main === module) {
 } else {
 	exports.RunIt = harness.RunIt;
 }
-
-
-
-
