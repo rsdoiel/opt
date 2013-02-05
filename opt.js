@@ -129,11 +129,13 @@ var optionWith = function (argv, sanity_function) {
 				output_argv.push(arg);
 			}
 		});
+		if (typeof sanity_function === "function") {
+			return sanity_function(output_argv);
+		}
 		return output_argv;
 	}
-	
 	if (typeof sanity_function === "function") {
-		return sanity_function();
+		return sanity_function(argv);
 	}
 	return true;
 };
